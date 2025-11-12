@@ -4,6 +4,10 @@ A modern, responsive **SaaS template** for a yoga platform built with React and 
 
 > **Note**: This is a frontend template. Backend integration is required for full functionality. Contact information provided below is for backend development inquiries.
 
+## 📸 Preview
+
+![Front Page Preview](./public/front-page.png)
+
 ## 🌟 Features
 
 ### Core Functionality
