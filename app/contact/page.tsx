@@ -1,3 +1,5 @@
+"use client";
+
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -9,7 +11,30 @@ import { MapPin, Phone, Mail, Clock } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 
-const Contact = () => {
+const contactInfo = [
+  {
+    icon: MapPin,
+    title: "Visit Us",
+    content: "123 Wellness Street, Mumbai, India 400001",
+  },
+  {
+    icon: Phone,
+    title: "Call Us",
+    content: "+91 9XXXXXXXXX",
+  },
+  {
+    icon: Mail,
+    title: "Email Us",
+    content: "tushardogra19@gmail.com",
+  },
+  {
+    icon: Clock,
+    title: "Studio Hours",
+    content: "Mon-Sat: 6AM - 9PM, Sun: 7AM - 7PM",
+  },
+];
+
+export default function ContactPage() {
   const { toast } = useToast();
   const [formData, setFormData] = useState({
     name: "",
@@ -20,8 +45,7 @@ const Contact = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Basic validation
+
     if (!formData.name || !formData.email || !formData.message) {
       toast({
         title: "Missing Information",
@@ -31,50 +55,25 @@ const Contact = () => {
       return;
     }
 
-    // Here you would normally send the form data to your backend
     toast({
       title: "Message Sent!",
       description: "Thank you for reaching out. We'll get back to you soon.",
     });
-    
-    // Reset form
+
     setFormData({ name: "", email: "", phone: "", message: "" });
   };
-
-  const contactInfo = [
-    {
-      icon: MapPin,
-      title: "Visit Us",
-      content: "123 Wellness Street, Mumbai, India 400001",
-    },
-    {
-      icon: Phone,
-      title: "Call Us",
-      content: "+91 9XXXXXXXXX",
-    },
-    {
-      icon: Mail,
-      title: "Email Us",
-      content: "tushardogra19@gmail.com",
-    },
-    {
-      icon: Clock,
-      title: "Studio Hours",
-      content: "Mon-Sat: 6AM - 9PM, Sun: 7AM - 7PM",
-    },
-  ];
 
   return (
     <div className="min-h-screen">
       <Navbar />
-      
+
       {/* Hero Section */}
       <section className="pt-32 pb-16 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto animate-fade-in">
             <h1 className="text-5xl md:text-6xl font-bold mb-6">Get In Touch</h1>
             <p className="text-xl text-muted-foreground">
-              Have questions? We'd love to hear from you. Send us a message and 
+              Have questions? We'd love to hear from you. Send us a message and
               we'll respond as soon as possible.
             </p>
           </div>
@@ -88,8 +87,8 @@ const Contact = () => {
             {contactInfo.map((info, index) => {
               const Icon = info.icon;
               return (
-                <Card 
-                  key={index} 
+                <Card
+                  key={index}
                   className="animate-slide-up"
                   style={{ animationDelay: `${index * 0.05}s` }}
                 >
@@ -189,9 +188,9 @@ const Contact = () => {
           <p className="text-lg text-primary-foreground/90 mb-6">
             Reach out to us on WhatsApp for instant support
           </p>
-          <a 
-            href="https://wa.me/8491057538" 
-            target="_blank" 
+          <a
+            href="https://wa.me/8491057538"
+            target="_blank"
             rel="noopener noreferrer"
           >
             <Button size="lg" variant="secondary">
@@ -204,6 +203,4 @@ const Contact = () => {
       <Footer />
     </div>
   );
-};
-
-export default Contact;
+}

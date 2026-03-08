@@ -3,85 +3,85 @@ import Footer from "@/components/Footer";
 import PricingCard from "@/components/PricingCard";
 import { Check } from "lucide-react";
 
-const Pricing = () => {
-  const plans = [
-    {
-      title: "Free Trial",
-      price: "Free",
-      description: "Perfect for trying out our platform",
-      features: [
-        "7 days full access",
-        "Access to 1 live class",
-        "3 recorded sessions",
-        "Basic progress tracking",
-        "Community forum access",
-      ],
-      buttonText: "Start Free Trial",
-    },
-    {
-      title: "Standard",
-      price: "₹799",
-      description: "For dedicated practitioners",
-      features: [
-        "Unlimited recorded sessions",
-        "5 live classes per month",
-        "Advanced progress tracking",
-        "Downloadable resources",
-        "Priority email support",
-        "Monthly wellness newsletter",
-      ],
-      isPopular: false,
-      buttonText: "Get Started",
-    },
-    {
-      title: "Premium",
-      price: "₹1,499",
-      description: "The complete wellness experience",
-      features: [
-        "Everything in Standard",
-        "Unlimited live sessions",
-        "1-on-1 monthly consultation",
-        "Personalized practice plans",
-        "Exclusive workshops & retreats",
-        "Early access to new content",
-        "Priority booking",
-        "Custom diet recommendations",
-      ],
-      isPopular: true,
-      buttonText: "Go Premium",
-    },
-  ];
+const plans = [
+  {
+    title: "Free Trial",
+    price: "Free",
+    description: "Perfect for trying out our platform",
+    features: [
+      "7 days full access",
+      "Access to 1 live class",
+      "3 recorded sessions",
+      "Basic progress tracking",
+      "Community forum access",
+    ],
+    buttonText: "Start Free Trial",
+  },
+  {
+    title: "Standard",
+    price: "₹799",
+    description: "For dedicated practitioners",
+    features: [
+      "Unlimited recorded sessions",
+      "5 live classes per month",
+      "Advanced progress tracking",
+      "Downloadable resources",
+      "Priority email support",
+      "Monthly wellness newsletter",
+    ],
+    isPopular: false,
+    buttonText: "Get Started",
+  },
+  {
+    title: "Premium",
+    price: "₹1,499",
+    description: "The complete wellness experience",
+    features: [
+      "Everything in Standard",
+      "Unlimited live sessions",
+      "1-on-1 monthly consultation",
+      "Personalized practice plans",
+      "Exclusive workshops & retreats",
+      "Early access to new content",
+      "Priority booking",
+      "Custom diet recommendations",
+    ],
+    isPopular: true,
+    buttonText: "Go Premium",
+  },
+];
 
-  const faqs = [
-    {
-      question: "Can I cancel my subscription anytime?",
-      answer: "Yes, you can cancel your subscription at any time. Your access will continue until the end of your billing period.",
-    },
-    {
-      question: "Do I need any equipment?",
-      answer: "All you need is a yoga mat and comfortable clothing. Props like blocks and straps are optional but can enhance your practice.",
-    },
-    {
-      question: "Are classes suitable for beginners?",
-      answer: "Absolutely! We offer classes for all levels, from complete beginners to advanced practitioners.",
-    },
-    {
-      question: "What's included in the live sessions?",
-      answer: "Live sessions include real-time instruction, the ability to ask questions, and personalized feedback from our instructor.",
-    },
-  ];
+const faqs = [
+  {
+    question: "Can I cancel my subscription anytime?",
+    answer: "Yes, you can cancel your subscription at any time. Your access will continue until the end of your billing period.",
+  },
+  {
+    question: "Do I need any equipment?",
+    answer: "All you need is a yoga mat and comfortable clothing. Props like blocks and straps are optional but can enhance your practice.",
+  },
+  {
+    question: "Are classes suitable for beginners?",
+    answer: "Absolutely! We offer classes for all levels, from complete beginners to advanced practitioners.",
+  },
+  {
+    question: "What's included in the live sessions?",
+    answer: "Live sessions include real-time instruction, the ability to ask questions, and personalized feedback from our instructor.",
+  },
+];
 
+export default function PricingPage() {
   return (
     <div className="min-h-screen">
       <Navbar />
-      
+
       {/* Hero Section */}
       <section className="pt-32 pb-16 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto animate-fade-in">
             <h1 className="text-5xl md:text-6xl font-bold mb-6">Choose Your Plan</h1>
             <p className="text-xl text-muted-foreground">
-              Start your wellness journey today with a plan that fits your lifestyle. 
+              Start your wellness journey today with a plan that fits your lifestyle.
               All plans include access to our supportive community.
             </p>
           </div>
@@ -93,8 +93,8 @@ const Pricing = () => {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {plans.map((plan, index) => (
-              <div 
-                key={index} 
+              <div
+                key={index}
                 className="animate-slide-up"
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
@@ -102,7 +102,7 @@ const Pricing = () => {
               </div>
             ))}
           </div>
-          
+
           {/* Money-back guarantee */}
           <div className="text-center mt-12 animate-fade-in">
             <div className="inline-flex items-center gap-2 px-6 py-3 bg-secondary/20 rounded-full">
@@ -177,8 +177,8 @@ const Pricing = () => {
             </h2>
             <div className="space-y-6">
               {faqs.map((faq, index) => (
-                <div 
-                  key={index} 
+                <div
+                  key={index}
                   className="p-6 rounded-xl bg-card shadow-[var(--shadow-soft)] animate-slide-up"
                   style={{ animationDelay: `${index * 0.05}s` }}
                 >
@@ -194,6 +194,4 @@ const Pricing = () => {
       <Footer />
     </div>
   );
-};
-
-export default Pricing;
+}

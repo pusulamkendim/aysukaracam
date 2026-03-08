@@ -2,65 +2,59 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import TestimonialCard from "@/components/TestimonialCard";
 
-import hathaImage from "@/assets/hatha-yoga.jpg";
-import vinyasaImage from "@/assets/vinyasa-yoga.jpg";
-import powerImage from "@/assets/power-yoga.jpg";
-import meditationImage from "@/assets/meditation.jpg";
-import heroImage from "@/assets/hero-yoga.jpg";
+const galleryImages = [
+  { src: "/images/hero-yoga.jpg", alt: "Peaceful outdoor yoga session" },
+  { src: "/images/hatha-yoga.jpg", alt: "Hatha yoga class in studio" },
+  { src: "/images/vinyasa-yoga.jpg", alt: "Dynamic vinyasa flow session" },
+  { src: "/images/power-yoga.jpg", alt: "Power yoga workout class" },
+  { src: "/images/meditation.jpg", alt: "Meditation and mindfulness practice" },
+  { src: "/images/hatha-yoga.jpg", alt: "Morning yoga practice" },
+];
 
-const Gallery = () => {
-  const galleryImages = [
-    { src: heroImage, alt: "Peaceful outdoor yoga session" },
-    { src: hathaImage, alt: "Hatha yoga class in studio" },
-    { src: vinyasaImage, alt: "Dynamic vinyasa flow session" },
-    { src: powerImage, alt: "Power yoga workout class" },
-    { src: meditationImage, alt: "Meditation and mindfulness practice" },
-    { src: hathaImage, alt: "Morning yoga practice" },
-  ];
+const testimonials = [
+  {
+    name: "Sarah Mitchell",
+    role: "Yoga Enthusiast",
+    content: "Serenity Yoga transformed my life. The instructors are knowledgeable and the community is so supportive. I've never felt better!",
+    rating: 5,
+  },
+  {
+    name: "David Chen",
+    role: "Premium Member",
+    content: "Best investment I've made in my wellness journey. The live sessions are incredible and the personalized guidance has helped me progress so much.",
+    rating: 5,
+  },
+  {
+    name: "Emma Rodriguez",
+    role: "Beginner Yogi",
+    content: "As a complete beginner, I felt welcomed and guided every step of the way. The community here is amazing!",
+    rating: 5,
+  },
+  {
+    name: "Michael Johnson",
+    role: "Standard Member",
+    content: "The variety of classes keeps me engaged. From power yoga to meditation, there's something for every mood and goal.",
+    rating: 5,
+  },
+  {
+    name: "Priya Sharma",
+    role: "Premium Member",
+    content: "The monthly consultations have been game-changing. Having personalized guidance makes all the difference in my practice.",
+    rating: 5,
+  },
+  {
+    name: "Alex Thompson",
+    role: "Yoga Enthusiast",
+    content: "I've tried many online yoga platforms, but Serenity Yoga stands out. The instruction quality and community support are unmatched.",
+    rating: 5,
+  },
+];
 
-  const testimonials = [
-    {
-      name: "Sarah Mitchell",
-      role: "Yoga Enthusiast",
-      content: "Serenity Yoga transformed my life. The instructors are knowledgeable and the community is so supportive. I've never felt better!",
-      rating: 5,
-    },
-    {
-      name: "David Chen",
-      role: "Premium Member",
-      content: "Best investment I've made in my wellness journey. The live sessions are incredible and the personalized guidance has helped me progress so much.",
-      rating: 5,
-    },
-    {
-      name: "Emma Rodriguez",
-      role: "Beginner Yogi",
-      content: "As a complete beginner, I felt welcomed and guided every step of the way. The community here is amazing!",
-      rating: 5,
-    },
-    {
-      name: "Michael Johnson",
-      role: "Standard Member",
-      content: "The variety of classes keeps me engaged. From power yoga to meditation, there's something for every mood and goal.",
-      rating: 5,
-    },
-    {
-      name: "Priya Sharma",
-      role: "Premium Member",
-      content: "The monthly consultations have been game-changing. Having personalized guidance makes all the difference in my practice.",
-      rating: 5,
-    },
-    {
-      name: "Alex Thompson",
-      role: "Yoga Enthusiast",
-      content: "I've tried many online yoga platforms, but Serenity Yoga stands out. The instruction quality and community support are unmatched.",
-      rating: 5,
-    },
-  ];
-
+export default function GalleryPage() {
   return (
     <div className="min-h-screen">
       <Navbar />
-      
+
       {/* Hero Section */}
       <section className="pt-32 pb-16 bg-muted/30">
         <div className="container mx-auto px-4">
@@ -111,8 +105,8 @@ const Gallery = () => {
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {testimonials.map((testimonial, index) => (
-              <div 
-                key={index} 
+              <div
+                key={index}
                 className="animate-slide-up"
                 style={{ animationDelay: `${index * 0.05}s` }}
               >
@@ -151,6 +145,4 @@ const Gallery = () => {
       <Footer />
     </div>
   );
-};
-
-export default Gallery;
+}

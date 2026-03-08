@@ -1,30 +1,33 @@
-import { Link, useLocation } from "react-router-dom";
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const location = useLocation();
+  const pathname = usePathname();
 
   const navLinks = [
-    { name: "Home", path: "/" },
-    { name: "About", path: "/about" },
-    { name: "Classes", path: "/classes" },
-    { name: "Pricing", path: "/pricing" },
-    { name: "Gallery", path: "/gallery" },
-    { name: "Contact", path: "/contact" },
+    { name: "Ana Sayfa", path: "/" },
+    { name: "Hakkımda", path: "/about" },
+    { name: "Dersler", path: "/classes" },
+    { name: "Fiyatlandırma", path: "/pricing" },
+    { name: "Galeri", path: "/gallery" },
+    { name: "İletişim", path: "/contact" },
   ];
 
-  const isActive = (path: string) => location.pathname === path;
+  const isActive = (path: string) => pathname === path;
 
   return (
     <nav className="fixed top-0 w-full bg-background/95 backdrop-blur-sm z-50 border-b border-border">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="font-heading text-2xl font-bold text-primary">
-            Serenity Yoga
+          <Link href="/" className="font-heading text-2xl font-bold text-primary">
+            Aysu Itır Karaçam
           </Link>
 
           {/* Desktop Navigation */}
@@ -32,7 +35,7 @@ const Navbar = () => {
             {navLinks.map((link) => (
               <Link
                 key={link.path}
-                to={link.path}
+                href={link.path}
                 className={`text-sm font-medium transition-colors hover:text-primary ${
                   isActive(link.path) ? "text-primary" : "text-foreground/70"
                 }`}
@@ -44,7 +47,7 @@ const Navbar = () => {
 
           {/* CTA Button */}
           <div className="hidden md:block">
-            <Link to="/dashboard">
+            <Link href="/dashboard">
               <Button variant="default" size="sm">
                 My Dashboard
               </Button>
@@ -67,7 +70,7 @@ const Navbar = () => {
             {navLinks.map((link) => (
               <Link
                 key={link.path}
-                to={link.path}
+                href={link.path}
                 onClick={() => setIsOpen(false)}
                 className={`block py-2 text-sm font-medium transition-colors hover:text-primary ${
                   isActive(link.path) ? "text-primary" : "text-foreground/70"
@@ -76,7 +79,7 @@ const Navbar = () => {
                 {link.name}
               </Link>
             ))}
-            <Link to="/dashboard" onClick={() => setIsOpen(false)}>
+            <Link href="/dashboard" onClick={() => setIsOpen(false)}>
               <Button variant="default" size="sm" className="w-full">
                 My Dashboard
               </Button>

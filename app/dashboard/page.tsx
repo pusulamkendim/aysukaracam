@@ -1,3 +1,5 @@
+"use client";
+
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -5,67 +7,66 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, TrendingUp, Award, Video, BookOpen } from "lucide-react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
-const Dashboard = () => {
-  // Mock user data - will be replaced with real auth later
-  const user = {
-    name: "Guest User",
-    plan: "Standard",
-    joinDate: "January 2025",
-    streak: 7,
-  };
+const user = {
+  name: "Guest User",
+  plan: "Standard",
+  joinDate: "January 2025",
+  streak: 7,
+};
 
-  const upcomingClasses = [
-    {
-      title: "Vinyasa Flow",
-      date: "Today, 6:00 PM",
-      duration: "75 min",
-      instructor: "Maya Patel",
-      type: "Live",
-    },
-    {
-      title: "Morning Meditation",
-      date: "Tomorrow, 7:00 AM",
-      duration: "45 min",
-      instructor: "Maya Patel",
-      type: "Live",
-    },
-  ];
+const upcomingClasses = [
+  {
+    title: "Vinyasa Flow",
+    date: "Today, 6:00 PM",
+    duration: "75 min",
+    instructor: "Maya Patel",
+    type: "Live",
+  },
+  {
+    title: "Morning Meditation",
+    date: "Tomorrow, 7:00 AM",
+    duration: "45 min",
+    instructor: "Maya Patel",
+    type: "Live",
+  },
+];
 
-  const recentActivity = [
-    {
-      title: "Hatha Yoga",
-      date: "2 days ago",
-      duration: "60 min",
-      completed: true,
-    },
-    {
-      title: "Power Yoga",
-      date: "4 days ago",
-      duration: "90 min",
-      completed: true,
-    },
-  ];
+const recentActivity = [
+  {
+    title: "Hatha Yoga",
+    date: "2 days ago",
+    duration: "60 min",
+    completed: true,
+  },
+  {
+    title: "Power Yoga",
+    date: "4 days ago",
+    duration: "90 min",
+    completed: true,
+  },
+];
 
-  const stats = [
-    { icon: Calendar, label: "Classes This Month", value: "12", color: "text-primary" },
-    { icon: Clock, label: "Total Hours", value: "18.5", color: "text-secondary" },
-    { icon: TrendingUp, label: "Current Streak", value: `${user.streak} days`, color: "text-accent" },
-    { icon: Award, label: "Level", value: "Intermediate", color: "text-primary" },
-  ];
+const stats = [
+  { icon: Calendar, label: "Classes This Month", value: "12", color: "text-primary" },
+  { icon: Clock, label: "Total Hours", value: "18.5", color: "text-secondary" },
+  { icon: TrendingUp, label: "Current Streak", value: `${user.streak} days`, color: "text-accent" },
+  { icon: Award, label: "Level", value: "Intermediate", color: "text-primary" },
+];
 
+export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-muted/30">
       <Navbar />
-      
+
       <div className="pt-24 pb-20">
         <div className="container mx-auto px-4">
           {/* Header */}
           <div className="mb-8 animate-fade-in">
             <h1 className="text-4xl font-bold mb-2">Welcome back, {user.name}!</h1>
             <p className="text-muted-foreground">
-              Member since {user.joinDate} • {user.plan} Plan
+              Member since {user.joinDate} &bull; {user.plan} Plan
             </p>
           </div>
 
@@ -74,8 +75,8 @@ const Dashboard = () => {
             {stats.map((stat, index) => {
               const Icon = stat.icon;
               return (
-                <Card 
-                  key={index} 
+                <Card
+                  key={index}
                   className="animate-slide-up"
                   style={{ animationDelay: `${index * 0.05}s` }}
                 >
@@ -109,7 +110,7 @@ const Dashboard = () => {
                       </CardTitle>
                       <CardDescription>Join your scheduled sessions</CardDescription>
                     </div>
-                    <Link to="/classes">
+                    <Link href="/classes">
                       <Button variant="outline" size="sm">Browse All</Button>
                     </Link>
                   </div>
@@ -128,7 +129,7 @@ const Dashboard = () => {
                           </Badge>
                         </div>
                         <p className="text-sm text-muted-foreground">
-                          {classItem.date} • {classItem.duration}
+                          {classItem.date} &bull; {classItem.duration}
                         </p>
                         <p className="text-xs text-muted-foreground mt-1">
                           with {classItem.instructor}
@@ -158,7 +159,7 @@ const Dashboard = () => {
                       <div className="flex-1">
                         <h3 className="font-semibold">{activity.title}</h3>
                         <p className="text-sm text-muted-foreground">
-                          {activity.date} • {activity.duration}
+                          {activity.date} &bull; {activity.duration}
                         </p>
                       </div>
                       {activity.completed && (
@@ -196,11 +197,11 @@ const Dashboard = () => {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <p className="text-sm">• 5 live classes per month</p>
-                    <p className="text-sm">• Unlimited recorded sessions</p>
-                    <p className="text-sm">• Advanced progress tracking</p>
+                    <p className="text-sm">&bull; 5 live classes per month</p>
+                    <p className="text-sm">&bull; Unlimited recorded sessions</p>
+                    <p className="text-sm">&bull; Advanced progress tracking</p>
                   </div>
-                  <Link to="/pricing">
+                  <Link href="/pricing">
                     <Button variant="outline" className="w-full">
                       Upgrade Plan
                     </Button>
@@ -214,12 +215,12 @@ const Dashboard = () => {
                   <CardTitle>Quick Actions</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
-                  <Link to="/classes" className="block">
+                  <Link href="/classes" className="block">
                     <Button variant="outline" className="w-full justify-start">
                       Browse Classes
                     </Button>
                   </Link>
-                  <Link to="/contact" className="block">
+                  <Link href="/contact" className="block">
                     <Button variant="outline" className="w-full justify-start">
                       Contact Support
                     </Button>
@@ -237,6 +238,4 @@ const Dashboard = () => {
       <Footer />
     </div>
   );
-};
-
-export default Dashboard;
+}

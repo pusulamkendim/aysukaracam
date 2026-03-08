@@ -1,88 +1,86 @@
+"use client";
+
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Footer from "@/components/Footer";
 import ClassCard from "@/components/ClassCard";
 import TestimonialCard from "@/components/TestimonialCard";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { Award, Heart, Users, TrendingUp } from "lucide-react";
 
-import hathaImage from "@/assets/hatha-yoga.jpg";
-import vinyasaImage from "@/assets/vinyasa-yoga.jpg";
-import powerImage from "@/assets/power-yoga.jpg";
+const featuredClasses = [
+  {
+    title: "Hatha Yoga",
+    description: "Gentle practice focusing on basic poses and breathing techniques",
+    duration: "60 min",
+    difficulty: "Beginner" as const,
+    image: "/images/hatha-yoga.jpg",
+    students: 234,
+  },
+  {
+    title: "Vinyasa Flow",
+    description: "Dynamic sequences linking breath with movement",
+    duration: "75 min",
+    difficulty: "Intermediate" as const,
+    image: "/images/vinyasa-yoga.jpg",
+    students: 189,
+  },
+  {
+    title: "Power Yoga",
+    description: "Intense workout combining strength, flexibility, and cardio",
+    duration: "90 min",
+    difficulty: "Advanced" as const,
+    image: "/images/power-yoga.jpg",
+    students: 156,
+  },
+];
 
-const Index = () => {
-  const featuredClasses = [
-    {
-      title: "Hatha Yoga",
-      description: "Gentle practice focusing on basic poses and breathing techniques",
-      duration: "60 min",
-      difficulty: "Beginner" as const,
-      image: hathaImage,
-      students: 234,
-    },
-    {
-      title: "Vinyasa Flow",
-      description: "Dynamic sequences linking breath with movement",
-      duration: "75 min",
-      difficulty: "Intermediate" as const,
-      image: vinyasaImage,
-      students: 189,
-    },
-    {
-      title: "Power Yoga",
-      description: "Intense workout combining strength, flexibility, and cardio",
-      duration: "90 min",
-      difficulty: "Advanced" as const,
-      image: powerImage,
-      students: 156,
-    },
-  ];
+const testimonials = [
+  {
+    name: "Sarah Mitchell",
+    role: "Yoga Enthusiast",
+    content: "Serenity Yoga transformed my life. The instructors are knowledgeable and the community is so supportive.",
+    rating: 5,
+  },
+  {
+    name: "David Chen",
+    role: "Premium Member",
+    content: "Best investment I've made in my wellness journey. The live sessions are incredible!",
+    rating: 5,
+  },
+  {
+    name: "Emma Rodriguez",
+    role: "Beginner Yogi",
+    content: "As a complete beginner, I felt welcomed and guided every step of the way.",
+    rating: 5,
+  },
+];
 
-  const testimonials = [
-    {
-      name: "Sarah Mitchell",
-      role: "Yoga Enthusiast",
-      content: "Serenity Yoga transformed my life. The instructors are knowledgeable and the community is so supportive.",
-      rating: 5,
-    },
-    {
-      name: "David Chen",
-      role: "Premium Member",
-      content: "Best investment I've made in my wellness journey. The live sessions are incredible!",
-      rating: 5,
-    },
-    {
-      name: "Emma Rodriguez",
-      role: "Beginner Yogi",
-      content: "As a complete beginner, I felt welcomed and guided every step of the way.",
-      rating: 5,
-    },
-  ];
+const benefits = [
+  {
+    icon: Heart,
+    title: "Holistic Wellness",
+    description: "Improve physical and mental health through mindful practice",
+  },
+  {
+    icon: Users,
+    title: "Community",
+    description: "Join a supportive community of like-minded individuals",
+  },
+  {
+    icon: Award,
+    title: "Expert Guidance",
+    description: "Learn from certified instructors with years of experience",
+  },
+  {
+    icon: TrendingUp,
+    title: "Track Progress",
+    description: "Monitor your journey with personalized analytics",
+  },
+];
 
-  const benefits = [
-    {
-      icon: Heart,
-      title: "Holistic Wellness",
-      description: "Improve physical and mental health through mindful practice",
-    },
-    {
-      icon: Users,
-      title: "Community",
-      description: "Join a supportive community of like-minded individuals",
-    },
-    {
-      icon: Award,
-      title: "Expert Guidance",
-      description: "Learn from certified instructors with years of experience",
-    },
-    {
-      icon: TrendingUp,
-      title: "Track Progress",
-      description: "Monitor your journey with personalized analytics",
-    },
-  ];
-
+export default function HomePage() {
   return (
     <div className="min-h-screen">
       <Navbar />
@@ -105,7 +103,7 @@ const Index = () => {
             ))}
           </div>
           <div className="text-center mt-12">
-            <Link to="/classes">
+            <Link href="/classes">
               <Button size="lg" variant="outline">
                 View All Classes
               </Button>
@@ -175,15 +173,15 @@ const Index = () => {
               First 7 days are completely free.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/pricing">
+              <Link href="/pricing">
                 <Button size="lg" variant="secondary" className="w-full sm:w-auto">
                   View Pricing Plans
                 </Button>
               </Link>
-              <Link to="/contact">
-                <Button 
-                  size="lg" 
-                  variant="outline" 
+              <Link href="/contact">
+                <Button
+                  size="lg"
+                  variant="outline"
                   className="w-full sm:w-auto bg-white/10 backdrop-blur-sm border-white/30 text-white hover:bg-white/20"
                 >
                   Contact Us
@@ -197,6 +195,4 @@ const Index = () => {
       <Footer />
     </div>
   );
-};
-
-export default Index;
+}
