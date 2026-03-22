@@ -1,6 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
@@ -14,6 +15,14 @@ const errorMessages: Record<string, string> = {
 };
 
 export default function AuthErrorPage() {
+  return (
+    <Suspense>
+      <AuthErrorContent />
+    </Suspense>
+  );
+}
+
+function AuthErrorContent() {
   const searchParams = useSearchParams();
   const errorType = searchParams.get("error") || "Default";
   const message = errorMessages[errorType] || errorMessages.Default;
