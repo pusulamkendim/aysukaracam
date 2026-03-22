@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { createZoomMeeting } from "@/lib/zoom";
 import { NextResponse } from "next/server";
 
 export async function GET() {
@@ -9,12 +10,12 @@ export async function GET() {
   }
 
   const classes = await prisma.class.findMany({
-    orderBy: { createdAt: "desc" },
+    orderBy: { scheduledAt: "asc" },
     include: {
       product: { select: { name: true } },
       enrollments: {
         include: {
-          user: { select: { id: true, name: true, email: true } },
+          user: { select: { id: true, name: true, email: true, phone: true } },
         },
       },
       _count: { select: { enrollments: true } },
@@ -31,30 +32,83 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
+  const repeatWeeks = body.repeatWeeks || 1; // Kaç hafta tekrarlansın (1 = tek ders)
+  const scheduledAt = body.scheduledAt ? new Date(body.scheduledAt) : null;
 
-  const cls = await prisma.class.create({
-    data: {
-      title: body.title,
-      description: body.description,
-      type: body.type || "LIVE",
-      productId: body.productId || null,
-      scheduledAt: body.scheduledAt ? new Date(body.scheduledAt) : null,
-      duration: body.duration,
-      recordingUrl: body.recordingUrl,
-      isActive: body.isActive ?? true,
-    },
-  });
+  // Zoom recurring meeting oluştur (tekrarlayan + canlı ise)
+  let zoomMeetingId: string | null = null;
+  let zoomJoinUrl: string | null = null;
+  let zoomStartUrl: string | null = null;
 
-  // Seçilen kullanıcılara enrollment oluştur
-  if (body.enrolledUserIds && body.enrolledUserIds.length > 0) {
-    await prisma.enrollment.createMany({
-      data: body.enrolledUserIds.map((userId: string) => ({
-        userId,
-        classId: cls.id,
-      })),
-      skipDuplicates: true,
-    });
+  if (body.type === "LIVE" && scheduledAt && body.createZoom) {
+    try {
+      const dayOfWeek = scheduledAt.getDay(); // 0=Sun, 1=Mon...
+      const zoomDayMap: Record<number, string> = { 0: "1", 1: "2", 2: "3", 3: "4", 4: "5", 5: "6", 6: "7" };
+
+      const meeting = await createZoomMeeting({
+        topic: body.title,
+        startTime: scheduledAt.toISOString(),
+        duration: body.duration || 60,
+        ...(repeatWeeks > 1 ? {
+          recurring: {
+            type: 2,
+            weeklyDays: zoomDayMap[dayOfWeek],
+            repeatInterval: 1,
+            endTimes: repeatWeeks,
+          },
+        } : {}),
+      });
+
+      zoomMeetingId = String(meeting.id);
+      zoomJoinUrl = meeting.join_url;
+      zoomStartUrl = meeting.start_url;
+    } catch (error) {
+      console.error("Zoom oluşturma hatası:", error);
+    }
   }
 
-  return NextResponse.json(cls, { status: 201 });
+  // Dersleri oluştur
+  const createdClasses = [];
+
+  for (let i = 0; i < repeatWeeks; i++) {
+    let classDate = scheduledAt;
+    if (scheduledAt && i > 0) {
+      classDate = new Date(scheduledAt);
+      classDate.setDate(classDate.getDate() + i * 7);
+    }
+
+    const cls = await prisma.class.create({
+      data: {
+        title: body.title,
+        description: body.description,
+        type: body.type || "LIVE",
+        productId: body.productId || null,
+        scheduledAt: classDate,
+        duration: body.duration,
+        recordingUrl: body.recordingUrl,
+        isActive: body.isActive ?? true,
+        zoomMeetingId,
+        zoomJoinUrl,
+        zoomStartUrl,
+      },
+    });
+
+    // Enrollment oluştur
+    if (body.enrolledUserIds && body.enrolledUserIds.length > 0) {
+      await prisma.enrollment.createMany({
+        data: body.enrolledUserIds.map((userId: string) => ({
+          userId,
+          classId: cls.id,
+        })),
+        skipDuplicates: true,
+      });
+    }
+
+    createdClasses.push(cls);
+  }
+
+  return NextResponse.json(
+    { count: createdClasses.length, classes: createdClasses },
+    { status: 201 }
+  );
 }

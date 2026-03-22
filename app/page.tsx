@@ -9,33 +9,8 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Award, Heart, Users, TrendingUp } from "lucide-react";
 import AboutSlider from "@/components/AboutSlider";
-
-const featuredClasses = [
-  {
-    title: "Hand Stand Paketi",
-    description: "El duruşu hedefleyen kapsamlı bir güç ve denge programı",
-    duration: "8 hafta",
-    difficulty: "Advanced" as const,
-    image: "/images/handstand.png",
-    price: "21.500 ₺",
-  },
-  {
-    title: "Kundalini Paketi",
-    description: "Enerjiyi uyandıran nefes, hareket ve meditasyon pratikleri",
-    duration: "4 hafta",
-    difficulty: "Intermediate" as const,
-    image: "/images/kundalini.jpg",
-    price: "7.900 ₺",
-  },
-  {
-    title: "Streching Paketi",
-    description: "Kasları derinlemesine açan ve esnekliği artıran esnetme programı",
-    duration: "4 hafta",
-    difficulty: "Beginner" as const,
-    image: "/images/streching3.jpg",
-    price: "9.900 ₺",
-  },
-];
+import { useQuery } from "@tanstack/react-query";
+import { formatPrice } from "@/lib/utils";
 
 const testimonials = [
   {
@@ -76,7 +51,25 @@ const benefits = [
   },
 ];
 
+interface Product {
+  id: string;
+  name: string;
+  description: string | null;
+  price: number;
+  type: string;
+  duration: string | null;
+  difficulty: string | null;
+  image: string | null;
+}
+
 export default function HomePage() {
+  const { data: products } = useQuery<Product[]>({
+    queryKey: ["featured-products"],
+    queryFn: () => fetch("/api/products?type=package").then((r) => r.json()),
+  });
+
+  const featuredProducts = (products || []).slice(0, 3);
+
   return (
     <div className="min-h-screen">
       <Navbar />
@@ -121,9 +114,17 @@ export default function HomePage() {
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {featuredClasses.map((classItem, index) => (
-              <div key={index} className="animate-slide-up" style={{ animationDelay: `${index * 0.1}s` }}>
-                <ClassCard {...classItem} />
+            {featuredProducts.map((product, index) => (
+              <div key={product.id} className="animate-slide-up" style={{ animationDelay: `${index * 0.1}s` }}>
+                <ClassCard
+                  title={product.name}
+                  description={product.description || ""}
+                  duration={product.duration || ""}
+                  difficulty={(product.difficulty as "Beginner" | "Intermediate" | "Advanced") || "Beginner"}
+                  image={product.image || ""}
+                  price={formatPrice(product.price)}
+                  productId={product.id}
+                />
               </div>
             ))}
           </div>

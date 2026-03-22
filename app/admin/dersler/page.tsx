@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, Pencil, Trash2, Video, Users, Search } from "lucide-react";
+import { Plus, Pencil, Trash2, Video, Users, Search, Repeat, MessageCircle } from "lucide-react";
 import DateTimePicker from "@/components/DateTimePicker";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -31,6 +31,7 @@ interface EnrolledUser {
   id: string;
   name: string | null;
   email: string;
+  phone: string | null;
 }
 
 interface ClassItem {
@@ -70,6 +71,8 @@ interface FormState {
   duration: number;
   recordingUrl: string;
   enrolledUserIds: string[];
+  repeatWeeks: number;
+  createZoom: boolean;
 }
 
 /** UTC ISO string'i local YYYY-MM-DDTHH:mm formatına çevirir */
@@ -92,6 +95,8 @@ const emptyClass: FormState = {
   duration: 60,
   recordingUrl: "",
   enrolledUserIds: [],
+  repeatWeeks: 1,
+  createZoom: true,
 };
 
 function ClassTable({
@@ -123,31 +128,25 @@ function ClassTable({
 
   return (
     <Card className={isPast ? "opacity-70" : ""}>
-      <CardContent className="p-0">
-        <table className="w-full">
+      <CardContent className="p-0 overflow-x-auto">
+        <table className="w-full min-w-[600px]">
           <thead className="border-b border-border">
             <tr className="text-left text-sm text-muted-foreground">
               <th className="p-4">Ders</th>
-              <th className="p-4">Tip</th>
               <th className="p-4">Tarih</th>
               <th className="p-4">Katılımcılar</th>
               <th className="p-4">Zoom</th>
-              <th className="p-4">İşlem</th>
+              <th className="p-4 sticky right-0 bg-card">İşlem</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
             {classes.map((cls) => (
               <tr key={cls.id} className={!cls.isActive ? "opacity-50" : ""}>
                 <td className="p-4">
-                  <p className="font-medium">{cls.title}</p>
+                  <p className="text-sm font-medium">{cls.title}</p>
                   {cls.product && (
-                    <p className="text-sm text-muted-foreground">{cls.product.name}</p>
+                    <p className="text-xs text-muted-foreground">{cls.product.name}</p>
                   )}
-                </td>
-                <td className="p-4">
-                  <Badge variant="outline">
-                    {cls.type === "LIVE" ? "Canlı" : cls.type === "RECORDED" ? "Kayıtlı" : "Paket"}
-                  </Badge>
                 </td>
                 <td className="p-4 text-sm">
                   {cls.scheduledAt
@@ -160,21 +159,78 @@ function ClassTable({
                     : "-"}
                 </td>
                 <td className="p-4">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <span className="font-medium">{cls._count.enrollments}</span>
                     {cls.enrollments.length > 0 && (
-                      <div className="flex flex-wrap gap-1">
-                        {cls.enrollments.slice(0, 3).map((e) => (
-                          <Badge key={e.user.id} variant="secondary" className="text-xs">
-                            {e.user.name || e.user.email.split("@")[0]}
-                          </Badge>
-                        ))}
-                        {cls.enrollments.length > 3 && (
-                          <Badge variant="outline" className="text-xs">
-                            +{cls.enrollments.length - 3}
-                          </Badge>
-                        )}
-                      </div>
+                      <>
+                        <div className="flex flex-wrap gap-1">
+                          {cls.enrollments.slice(0, 5).map((e) => {
+                            const dateStr = cls.scheduledAt
+                              ? new Date(cls.scheduledAt).toLocaleDateString("tr-TR", {
+                                  day: "numeric", month: "long", weekday: "long",
+                                  hour: "2-digit", minute: "2-digit",
+                                })
+                              : "";
+                            const message = encodeURIComponent(
+                              `Merhaba ${e.user.name || ""}! 🧘\n\n` +
+                              `"${cls.title}" dersiniz hakkında bilgilendirme:\n` +
+                              (dateStr ? `📅 ${dateStr}\n` : "") +
+                              (cls.duration ? `⏱ ${cls.duration} dakika\n` : "") +
+                              (cls.zoomJoinUrl ? `\n🔗 Zoom: ${cls.zoomJoinUrl}\n` : "") +
+                              `\nGörüşmek üzere!`
+                            );
+                            const phone = e.user.phone?.replace(/\D/g, "") || "";
+                            const waUrl = phone ? `https://wa.me/${phone}?text=${message}` : null;
+
+                            return waUrl ? (
+                              <a key={e.user.id} href={waUrl} target="_blank" rel="noopener noreferrer">
+                                <Badge variant="secondary" className="text-xs gap-1 cursor-pointer hover:bg-secondary/80">
+                                  <MessageCircle size={10} />
+                                  {e.user.name || e.user.email.split("@")[0]}
+                                </Badge>
+                              </a>
+                            ) : (
+                              <Badge key={e.user.id} variant="secondary" className="text-xs">
+                                {e.user.name || e.user.email.split("@")[0]}
+                              </Badge>
+                            );
+                          })}
+                          {cls.enrollments.length > 5 && (
+                            <Badge variant="outline" className="text-xs">
+                              +{cls.enrollments.length - 5}
+                            </Badge>
+                          )}
+                        </div>
+                        {(() => {
+                          if (cls.enrollments.length === 0) return null;
+                          return (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="text-xs h-6 gap-1"
+                              onClick={() => {
+                                const dateStr = cls.scheduledAt
+                                  ? new Date(cls.scheduledAt).toLocaleDateString("tr-TR", {
+                                      day: "numeric", month: "long", weekday: "long",
+                                      hour: "2-digit", minute: "2-digit",
+                                    })
+                                  : "";
+                                const message =
+                                  `🧘 "${cls.title}" dersiniz hakkında bilgilendirme:\n\n` +
+                                  (dateStr ? `📅 ${dateStr}\n` : "") +
+                                  (cls.duration ? `⏱ ${cls.duration} dakika\n` : "") +
+                                  (cls.zoomJoinUrl ? `\n🔗 Zoom: ${cls.zoomJoinUrl}\n` : "") +
+                                  `\nGörüşmek üzere!`;
+                                navigator.clipboard.writeText(message);
+                                toast.success("Mesaj panoya kopyalandı");
+                              }}
+                            >
+                              <MessageCircle size={10} />
+                              Mesajı Kopyala
+                            </Button>
+                          );
+                        })()}
+                      </>
                     )}
                   </div>
                 </td>
@@ -217,7 +273,7 @@ function ClassTable({
                     <span className="text-muted-foreground">-</span>
                   )}
                 </td>
-                <td className="p-4">
+                <td className="p-4 sticky right-0 bg-card">
                   <div className="flex gap-2">
                     <Button variant="ghost" size="icon" onClick={() => onEdit(cls)}>
                       <Pencil size={16} />
@@ -285,7 +341,7 @@ export default function ClassesAdminPage() {
       setEditingId(null);
       setForm(emptyClass);
       setUserSearch("");
-      toast.success(editingId ? "Ders güncellendi" : "Ders eklendi");
+      toast.success(editingId ? "Ders güncellendi" : `${form.repeatWeeks > 1 ? form.repeatWeeks + " ders" : "Ders"} eklendi`);
     },
     onError: () => toast.error("Bir hata oluştu"),
   });
@@ -323,6 +379,8 @@ export default function ClassesAdminPage() {
       duration: cls.duration || 60,
       recordingUrl: cls.recordingUrl || "",
       enrolledUserIds: cls.enrollments.map((e) => e.user.id),
+      repeatWeeks: 1,
+      createZoom: false,
     });
     setUserSearch("");
     setOpen(true);
@@ -409,11 +467,57 @@ export default function ClassesAdminPage() {
                 </Select>
               </div>
               {form.type === "LIVE" && (
-                <DateTimePicker
-                  label="Tarih & Saat"
-                  value={form.scheduledAt}
-                  onChange={(v) => setForm({ ...form, scheduledAt: v })}
-                />
+                <>
+                  <DateTimePicker
+                    label="İlk Ders Tarihi & Saati"
+                    value={form.scheduledAt}
+                    onChange={(v) => setForm({ ...form, scheduledAt: v })}
+                  />
+
+                  {/* Tekrar & Zoom */}
+                  {!editingId && (
+                    <div className="space-y-3 p-3 rounded-lg border border-border bg-muted/30">
+                      <div className="flex items-center gap-2">
+                        <Repeat size={16} className="text-muted-foreground" />
+                        <Label className="font-medium">Tekrarlayan Ders</Label>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                          <Label className="text-xs text-muted-foreground">Kaç hafta?</Label>
+                          <Select
+                            value={String(form.repeatWeeks)}
+                            onValueChange={(v) => setForm({ ...form, repeatWeeks: Number(v) })}
+                          >
+                            <SelectTrigger><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="1">Tek ders</SelectItem>
+                              <SelectItem value="4">4 hafta</SelectItem>
+                              <SelectItem value="8">8 hafta</SelectItem>
+                              <SelectItem value="12">12 hafta</SelectItem>
+                              <SelectItem value="16">16 hafta</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs text-muted-foreground">Zoom toplantısı</Label>
+                          <label className="flex items-center gap-2 h-10 cursor-pointer">
+                            <Checkbox
+                              checked={form.createZoom}
+                              onCheckedChange={(v) => setForm({ ...form, createZoom: !!v })}
+                            />
+                            <span className="text-sm">Otomatik oluştur</span>
+                          </label>
+                        </div>
+                      </div>
+                      {form.repeatWeeks > 1 && form.scheduledAt && (
+                        <p className="text-xs text-muted-foreground">
+                          {form.repeatWeeks} ders oluşturulacak: her hafta aynı gün ve saatte
+                          {form.createZoom && " (tek Zoom linki)"}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </>
               )}
               {form.type === "RECORDED" && (
                 <div className="space-y-2">
@@ -510,13 +614,17 @@ export default function ClassesAdminPage() {
         <p className="text-muted-foreground">Yükleniyor...</p>
       ) : (
         <div className="space-y-8">
-          {/* Yaklaşan / Aktif Dersler */}
+          {/* Yaklaşan Dersler - önümüzdeki 2 hafta */}
           <div>
-            <h2 className="text-xl font-semibold mb-4">Yaklaşan Dersler</h2>
+            <h2 className="text-xl font-semibold mb-4">Yaklaşan Dersler <span className="text-sm font-normal text-muted-foreground">(2 hafta)</span></h2>
             <ClassTable
-              classes={(classes || []).filter(
-                (c) => c.isActive && (!c.scheduledAt || new Date(c.scheduledAt) > new Date())
-              )}
+              classes={(() => {
+                const now = new Date();
+                const twoWeeksLater = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
+                return (classes || []).filter(
+                  (c) => c.isActive && c.scheduledAt && new Date(c.scheduledAt) > now && new Date(c.scheduledAt) <= twoWeeksLater
+                );
+              })()}
               onEdit={openEdit}
               onDelete={(id) => deleteMutation.mutate(id)}
               onCreateZoom={(id) => createZoomMutation.mutate(id)}
@@ -524,6 +632,31 @@ export default function ClassesAdminPage() {
               emptyMessage="Yaklaşan ders bulunmuyor"
             />
           </div>
+
+          {/* İlerideki Dersler - 2 haftadan sonra */}
+          {(() => {
+            const twoWeeksLater = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
+            const futureClasses = (classes || []).filter(
+              (c) => c.isActive && c.scheduledAt && new Date(c.scheduledAt) > twoWeeksLater
+            );
+            const noDateClasses = (classes || []).filter(
+              (c) => c.isActive && !c.scheduledAt
+            );
+            const allFuture = [...futureClasses, ...noDateClasses];
+            return allFuture.length > 0 ? (
+              <div>
+                <h2 className="text-xl font-semibold mb-4 text-muted-foreground">İlerideki Dersler</h2>
+                <ClassTable
+                  classes={allFuture}
+                  onEdit={openEdit}
+                  onDelete={(id) => deleteMutation.mutate(id)}
+                  onCreateZoom={(id) => createZoomMutation.mutate(id)}
+                  zoomPending={createZoomMutation.isPending}
+                  emptyMessage=""
+                />
+              </div>
+            ) : null;
+          })()}
 
           {/* Geçmiş Dersler */}
           <div>

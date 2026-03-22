@@ -24,7 +24,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <div className="min-h-screen flex">
       {/* Mobile Header */}
       <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between h-14 px-4 bg-card border-b border-border md:hidden">
-        <h2 className="font-bold">Admin Panel</h2>
+        <span className="font-bold">Admin Panel</span>
         <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-2">
           {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
@@ -44,10 +44,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         md:static md:translate-x-0
         ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
       `}>
-        <div className="mb-8 hidden md:block">
-          <h2 className="text-xl font-bold">Admin Panel</h2>
-          <p className="text-sm text-muted-foreground">Yönetim Paneli</p>
-        </div>
+        <Link href="/" className="mb-8 hidden md:block group">
+          <h2 className="text-xl font-bold group-hover:text-primary transition-colors">Admin Panel</h2>
+          <p className="text-sm text-muted-foreground">← Siteye dön</p>
+        </Link>
 
         <div className="mb-8 md:hidden h-8" />
 
@@ -73,7 +73,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           })}
         </nav>
 
-        <Link href="/" onClick={() => setSidebarOpen(false)}>
+        <Link href="/" onClick={() => setSidebarOpen(false)} className="md:hidden">
           <Button variant="ghost" className="w-full justify-start mt-4">
             <ArrowLeft size={16} className="mr-2" />
             Siteye Dön

@@ -14,37 +14,68 @@ export async function PATCH(
   const { id } = await params;
   const body = await request.json();
 
-  const { enrolledUserIds, ...classData } = body;
+  // Sadece class modeline ait alanları al
+  const classData: Record<string, unknown> = {};
+  if (body.title !== undefined) classData.title = body.title;
+  if (body.description !== undefined) classData.description = body.description;
+  if (body.type !== undefined) classData.type = body.type;
+  if (body.productId !== undefined) classData.productId = body.productId || null;
+  if (body.scheduledAt !== undefined) classData.scheduledAt = body.scheduledAt ? new Date(body.scheduledAt) : null;
+  if (body.duration !== undefined) classData.duration = body.duration;
+  if (body.recordingUrl !== undefined) classData.recordingUrl = body.recordingUrl;
+  if (body.isActive !== undefined) classData.isActive = body.isActive;
 
-  if (classData.scheduledAt) {
-    classData.scheduledAt = new Date(classData.scheduledAt);
-  }
-
-  const cls = await prisma.class.update({
-    where: { id },
-    data: classData,
-  });
-
-  // Enrollment'ları güncelle (varsa)
-  if (enrolledUserIds !== undefined) {
-    // Mevcut enrollment'ları sil
-    await prisma.enrollment.deleteMany({
-      where: { classId: id },
+  try {
+    const cls = await prisma.class.update({
+      where: { id },
+      data: classData,
     });
 
-    // Yenilerini oluştur
-    if (enrolledUserIds.length > 0) {
-      await prisma.enrollment.createMany({
-        data: enrolledUserIds.map((userId: string) => ({
-          userId,
-          classId: id,
-        })),
-        skipDuplicates: true,
-      });
-    }
-  }
+    // Enrollment'ları güncelle (varsa)
+    if (body.enrolledUserIds !== undefined) {
+      // Bu dersin tekrarlayan serisi var mı kontrol et
+      const relatedClassIds = [id];
 
-  return NextResponse.json(cls);
+      if (cls.zoomMeetingId && body.applyToSeries !== false) {
+        // Aynı Zoom linkine sahip gelecek dersleri bul
+        const relatedClasses = await prisma.class.findMany({
+          where: {
+            zoomMeetingId: cls.zoomMeetingId,
+            isActive: true,
+            scheduledAt: { gte: new Date() },
+            id: { not: id },
+          },
+          select: { id: true },
+        });
+        relatedClassIds.push(...relatedClasses.map((c) => c.id));
+      }
+
+      // Tüm ilgili derslerin enrollment'larını güncelle
+      for (const classId of relatedClassIds) {
+        await prisma.enrollment.deleteMany({
+          where: { classId },
+        });
+
+        if (body.enrolledUserIds.length > 0) {
+          await prisma.enrollment.createMany({
+            data: body.enrolledUserIds.map((userId: string) => ({
+              userId,
+              classId,
+            })),
+            skipDuplicates: true,
+          });
+        }
+      }
+    }
+
+    return NextResponse.json(cls);
+  } catch (error) {
+    console.error("Ders güncelleme hatası:", error);
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Güncelleme başarısız" },
+      { status: 500 }
+    );
+  }
 }
 
 export async function DELETE(

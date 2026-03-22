@@ -102,6 +102,11 @@ export async function POST(request: Request) {
             });
           }
         }
+
+        // Ödeme onaylandı - sepeti temizle
+        await prisma.cartItem.deleteMany({
+          where: { userId: orderWithItems.userId },
+        });
       }
     }
 

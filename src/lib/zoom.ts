@@ -38,6 +38,12 @@ interface CreateMeetingParams {
   topic: string;
   startTime: string; // ISO 8601
   duration: number; // dakika
+  recurring?: {
+    type: 2; // Weekly
+    weeklyDays: string; // "1"=Sun, "2"=Mon, ... "7"=Sat
+    repeatInterval: number; // Her kaç haftada bir
+    endTimes: number; // Kaç kez tekrarlansın
+  };
 }
 
 interface ZoomMeeting {
@@ -51,25 +57,36 @@ export async function createZoomMeeting(
 ): Promise<ZoomMeeting> {
   const token = await getAccessToken();
 
+  const body: Record<string, unknown> = {
+    topic: params.topic,
+    type: params.recurring ? 8 : 2, // 8 = Recurring with fixed time, 2 = Scheduled
+    start_time: params.startTime,
+    duration: params.duration,
+    timezone: "Europe/Istanbul",
+    settings: {
+      join_before_host: false,
+      waiting_room: true,
+      mute_upon_entry: true,
+      auto_recording: "cloud",
+    },
+  };
+
+  if (params.recurring) {
+    body.recurrence = {
+      type: params.recurring.type,
+      weekly_days: params.recurring.weeklyDays,
+      repeat_interval: params.recurring.repeatInterval,
+      end_times: params.recurring.endTimes,
+    };
+  }
+
   const res = await fetch("https://api.zoom.us/v2/users/me/meetings", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      topic: params.topic,
-      type: 2, // Scheduled meeting
-      start_time: params.startTime,
-      duration: params.duration,
-      timezone: "Europe/Istanbul",
-      settings: {
-        join_before_host: false,
-        waiting_room: true,
-        mute_upon_entry: true,
-        auto_recording: "cloud",
-      },
-    }),
+    body: JSON.stringify(body),
   });
 
   if (!res.ok) {

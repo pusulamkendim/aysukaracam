@@ -23,5 +23,44 @@ export async function PATCH(
     data: { status },
   });
 
+  // Ödendi olarak işaretlendiğinde sepeti temizle + enrollment oluştur
+  if (status === "PAID") {
+    await prisma.cartItem.deleteMany({
+      where: { userId: order.userId },
+    });
+
+    // Enrollment oluştur
+    const orderWithItems = await prisma.order.findUnique({
+      where: { id },
+      include: {
+        items: {
+          include: {
+            product: { include: { classes: true } },
+          },
+        },
+      },
+    });
+
+    if (orderWithItems) {
+      for (const item of orderWithItems.items) {
+        for (const cls of item.product.classes) {
+          await prisma.enrollment.upsert({
+            where: {
+              userId_classId: {
+                userId: order.userId,
+                classId: cls.id,
+              },
+            },
+            update: {},
+            create: {
+              userId: order.userId,
+              classId: cls.id,
+            },
+          });
+        }
+      }
+    }
+  }
+
   return NextResponse.json(order);
 }

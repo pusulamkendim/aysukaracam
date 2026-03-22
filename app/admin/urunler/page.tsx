@@ -78,8 +78,8 @@ function ProductTable({
 
   return (
     <Card className={isPast ? "opacity-70" : ""}>
-      <CardContent className="p-0">
-        <table className="w-full">
+      <CardContent className="p-0 overflow-x-auto">
+        <table className="w-full min-w-[600px]">
           <thead className="border-b border-border">
             <tr className="text-left text-sm text-muted-foreground">
               <th className="p-4">Ürün</th>
@@ -87,7 +87,7 @@ function ProductTable({
               <th className="p-4">Fiyat</th>
               <th className="p-4">Shopier</th>
               <th className="p-4">Sipariş</th>
-              <th className="p-4">İşlem</th>
+              <th className="p-4 sticky right-0 bg-card">İşlem</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
@@ -118,7 +118,7 @@ function ProductTable({
                   )}
                 </td>
                 <td className="p-4">{product._count.orderItems}</td>
-                <td className="p-4">
+                <td className="p-4 sticky right-0 bg-card">
                   <div className="flex gap-2">
                     <Button variant="ghost" size="icon" onClick={() => onEdit(product)}>
                       <Pencil size={16} />

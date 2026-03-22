@@ -66,16 +66,16 @@ export default function OrdersPage() {
         <p className="text-muted-foreground">Yükleniyor...</p>
       ) : (
         <Card>
-          <CardContent className="p-0">
-            <table className="w-full">
+          <CardContent className="p-0 overflow-x-auto">
+            <table className="w-full min-w-[600px]">
               <thead className="border-b border-border">
                 <tr className="text-left text-sm text-muted-foreground">
                   <th className="p-4">Müşteri</th>
                   <th className="p-4">Ürünler</th>
                   <th className="p-4">Tutar</th>
                   <th className="p-4">Tarih</th>
-                  <th className="p-4">Gumroad</th>
-                  <th className="p-4">Durum</th>
+                  <th className="p-4">Shopier</th>
+                  <th className="p-4 sticky right-0 bg-card">Durum</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -105,7 +105,7 @@ export default function OrdersPage() {
                         "-"
                       )}
                     </td>
-                    <td className="p-4">
+                    <td className="p-4 sticky right-0 bg-card">
                       <Select
                         value={order.status}
                         onValueChange={(v) => updateStatus.mutate({ id: order.id, status: v })}

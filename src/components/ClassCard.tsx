@@ -69,12 +69,14 @@ const ClassCard = ({ title, description, duration, difficulty, image, students, 
 
   return (
     <Card className="group relative overflow-hidden hover:shadow-[var(--shadow-hover)] transition-all duration-300 aspect-[3/4]">
-      <Image
-        src={image}
-        alt={`${title} yoga dersi`}
-        fill
-        className="object-cover group-hover:scale-105 transition-transform duration-300"
-      />
+      {image && (
+        <Image
+          src={image}
+          alt={`${title} yoga dersi`}
+          fill
+          className="object-cover group-hover:scale-105 transition-transform duration-300"
+        />
+      )}
       <Badge className={`absolute top-4 right-4 z-10 text-xl px-3 py-1 ${difficultyColors[difficulty]}`}>
         {difficulty}
       </Badge>

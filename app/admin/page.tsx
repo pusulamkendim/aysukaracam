@@ -5,12 +5,16 @@ import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import { formatPrice } from "@/lib/utils";
 import { Users, CreditCard, Package, GraduationCap } from "lucide-react";
+import Link from "next/link";
 
 interface DashboardData {
   totalUsers: number;
-  totalOrders: number;
+  paidOrderCount: number;
+  pendingOrderCount: number;
   totalRevenue: number;
-  totalClasses: number;
+  pendingRevenue: number;
+  upcomingClasses: number;
+  pastClasses: number;
   totalEnrollments: number;
   recentOrders: {
     id: string;
@@ -33,10 +37,10 @@ export default function AdminDashboardPage() {
   }
 
   const stats = [
-    { icon: Users, label: "Toplam Üye", value: data?.totalUsers ?? 0, color: "text-primary" },
-    { icon: CreditCard, label: "Toplam Gelir", value: formatPrice(data?.totalRevenue ?? 0), color: "text-secondary" },
-    { icon: Package, label: "Siparişler", value: data?.totalOrders ?? 0, color: "text-accent" },
-    { icon: GraduationCap, label: "Aktif Dersler", value: data?.totalClasses ?? 0, color: "text-primary" },
+    { icon: Users, label: "Toplam Üye", value: data?.totalUsers ?? 0, color: "text-primary", href: "/admin/uyeler" },
+    { icon: CreditCard, label: "Onaylanan Gelir", value: formatPrice(data?.totalRevenue ?? 0), color: "text-secondary", sub: `Bekleyen: ${formatPrice(data?.pendingRevenue ?? 0)}`, href: "/admin/siparisler" },
+    { icon: Package, label: "Onaylanan Sipariş", value: data?.paidOrderCount ?? 0, color: "text-accent", sub: `Bekleyen: ${data?.pendingOrderCount ?? 0}`, href: "/admin/siparisler" },
+    { icon: GraduationCap, label: "Yaklaşan Dersler", value: data?.upcomingClasses ?? 0, color: "text-primary", sub: `Geçmiş: ${data?.pastClasses ?? 0}`, href: "/admin/dersler" },
   ];
 
   return (
@@ -48,8 +52,9 @@ export default function AdminDashboardPage() {
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
-            <Card key={index}>
-              <CardContent className="pt-6">
+            <Link key={index} href={stat.href}>
+            <Card className="hover:shadow-[var(--shadow-hover)] transition-all cursor-pointer h-full">
+              <CardContent className="pt-6 h-full">
                 <div className="flex items-center gap-4">
                   <div className={`p-3 rounded-lg bg-primary/10 ${stat.color}`}>
                     <Icon size={24} />
@@ -57,10 +62,14 @@ export default function AdminDashboardPage() {
                   <div>
                     <p className="text-2xl font-bold">{stat.value}</p>
                     <p className="text-sm text-muted-foreground">{stat.label}</p>
+                    {"sub" in stat && stat.sub && (
+                      <p className="text-xs text-muted-foreground/70 mt-0.5">{stat.sub}</p>
+                    )}
                   </div>
                 </div>
               </CardContent>
             </Card>
+            </Link>
           );
         })}
       </div>
