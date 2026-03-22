@@ -3,49 +3,49 @@ import Footer from "@/components/Footer";
 import TestimonialCard from "@/components/TestimonialCard";
 
 const galleryImages = [
-  { src: "/images/hero-yoga.jpg", alt: "Peaceful outdoor yoga session" },
-  { src: "/images/hatha-yoga.jpg", alt: "Hatha yoga class in studio" },
-  { src: "/images/vinyasa-yoga.jpg", alt: "Dynamic vinyasa flow session" },
-  { src: "/images/power-yoga.jpg", alt: "Power yoga workout class" },
-  { src: "/images/meditation.jpg", alt: "Meditation and mindfulness practice" },
-  { src: "/images/hatha-yoga.jpg", alt: "Morning yoga practice" },
+  { src: "/images/hero-yoga.jpg", alt: "Açık havada huzurlu yoga seansı" },
+  { src: "/images/hatha-yoga.jpg", alt: "Stüdyoda Hatha yoga dersi" },
+  { src: "/images/vinyasa-yoga.jpg", alt: "Dinamik vinyasa akış seansı" },
+  { src: "/images/power-yoga.jpg", alt: "Power yoga antrenman dersi" },
+  { src: "/images/meditation.jpg", alt: "Meditasyon ve farkındalık pratiği" },
+  { src: "/images/hatha-yoga.jpg", alt: "Sabah yoga pratiği" },
 ];
 
 const testimonials = [
   {
-    name: "Sarah Mitchell",
-    role: "Yoga Enthusiast",
-    content: "Serenity Yoga transformed my life. The instructors are knowledgeable and the community is so supportive. I've never felt better!",
+    name: "Ayşe Yılmaz",
+    role: "Yoga Tutkunu",
+    content: "Bu yoga stüdyosu hayatımı değiştirdi. Eğitmen çok bilgili ve topluluk inanılmaz derecede destekleyici. Kendimi hiç bu kadar iyi hissetmemiştim!",
     rating: 5,
   },
   {
-    name: "David Chen",
-    role: "Premium Member",
-    content: "Best investment I've made in my wellness journey. The live sessions are incredible and the personalized guidance has helped me progress so much.",
+    name: "Mehmet Kaya",
+    role: "Premium Üye",
+    content: "Sağlık yolculuğumda yaptığım en iyi yatırım. Canlı dersler inanılmaz ve kişiselleştirilmiş rehberlik ilerlememde çok yardımcı oldu.",
     rating: 5,
   },
   {
-    name: "Emma Rodriguez",
-    role: "Beginner Yogi",
-    content: "As a complete beginner, I felt welcomed and guided every step of the way. The community here is amazing!",
+    name: "Elif Demir",
+    role: "Yeni Başlayan",
+    content: "Tamamen yeni başlayan biri olarak kendimi her adımda hoş karşılanmış ve yönlendirilmiş hissettim. Buradaki topluluk harika!",
     rating: 5,
   },
   {
-    name: "Michael Johnson",
-    role: "Standard Member",
-    content: "The variety of classes keeps me engaged. From power yoga to meditation, there's something for every mood and goal.",
+    name: "Can Özkan",
+    role: "Standart Üye",
+    content: "Ders çeşitliliği beni sürekli motive ediyor. Power yogadan meditasyona, her ruh haline ve hedefe uygun bir şey var.",
     rating: 5,
   },
   {
-    name: "Priya Sharma",
-    role: "Premium Member",
-    content: "The monthly consultations have been game-changing. Having personalized guidance makes all the difference in my practice.",
+    name: "Zeynep Aydın",
+    role: "Premium Üye",
+    content: "Aylık danışmanlıklar oyun değiştirici oldu. Kişiselleştirilmiş rehberlik pratiğimde büyük fark yarattı.",
     rating: 5,
   },
   {
-    name: "Alex Thompson",
-    role: "Yoga Enthusiast",
-    content: "I've tried many online yoga platforms, but Serenity Yoga stands out. The instruction quality and community support are unmatched.",
+    name: "Burak Şahin",
+    role: "Yoga Tutkunu",
+    content: "Birçok online yoga platformu denedim ama bu stüdyo fark yaratıyor. Eğitim kalitesi ve topluluk desteği eşsiz.",
     rating: 5,
   },
 ];
@@ -55,23 +55,23 @@ export default function GalleryPage() {
     <div className="min-h-screen">
       <Navbar />
 
-      {/* Hero Section */}
+      {/* Hero Bölümü */}
       <section className="pt-32 pb-16 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto animate-fade-in">
-            <h1 className="text-5xl md:text-6xl font-bold mb-6">Gallery & Testimonials</h1>
+            <h1 className="text-5xl md:text-6xl font-bold mb-6">Galeri & Yorumlar</h1>
             <p className="text-xl text-muted-foreground">
-              Explore moments from our yoga community and hear from our amazing students
+              Yoga topluluğumuzdan anları keşfedin ve harika öğrencilerimizden dinleyin
             </p>
           </div>
         </div>
       </section>
 
-      {/* Gallery Grid */}
+      {/* Galeri Grid */}
       <section className="py-20">
         <div className="container mx-auto px-4">
           <h2 className="text-4xl font-bold text-center mb-12 animate-fade-in">
-            Studio Moments
+            Stüdyo Anları
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {galleryImages.map((image, index) => (
@@ -94,14 +94,14 @@ export default function GalleryPage() {
         </div>
       </section>
 
-      {/* Testimonials */}
+      {/* Öğrenci Yorumları */}
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
           <h2 className="text-4xl font-bold text-center mb-4 animate-fade-in">
-            What Our Students Say
+            Beni Öğrencilerimden Duyun
           </h2>
           <p className="text-center text-muted-foreground mb-12 max-w-2xl mx-auto">
-            Join thousands of satisfied students who have transformed their lives through yoga
+            Yoga ile hayatını dönüştüren binlerce memnun öğrenciye katılın
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {testimonials.map((testimonial, index) => (
@@ -117,26 +117,26 @@ export default function GalleryPage() {
         </div>
       </section>
 
-      {/* Stats Section */}
+      {/* İstatistikler */}
       <section className="py-20 bg-primary text-primary-foreground">
         <div className="container mx-auto px-4">
-          <h2 className="text-4xl font-bold text-center mb-12">Our Impact</h2>
+          <h2 className="text-4xl font-bold text-center mb-12">Etkimiz</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div className="text-center animate-fade-in">
               <div className="text-5xl font-bold mb-2">500+</div>
-              <div className="text-primary-foreground/80">Happy Students</div>
+              <div className="text-primary-foreground/80">Mutlu Öğrenci</div>
             </div>
             <div className="text-center animate-fade-in" style={{ animationDelay: '0.1s' }}>
               <div className="text-5xl font-bold mb-2">1000+</div>
-              <div className="text-primary-foreground/80">Classes Conducted</div>
+              <div className="text-primary-foreground/80">Verilen Ders</div>
             </div>
             <div className="text-center animate-fade-in" style={{ animationDelay: '0.2s' }}>
               <div className="text-5xl font-bold mb-2">4.9/5</div>
-              <div className="text-primary-foreground/80">Average Rating</div>
+              <div className="text-primary-foreground/80">Ortalama Puan</div>
             </div>
             <div className="text-center animate-fade-in" style={{ animationDelay: '0.3s' }}>
               <div className="text-5xl font-bold mb-2">10+</div>
-              <div className="text-primary-foreground/80">Years Experience</div>
+              <div className="text-primary-foreground/80">Yıl Deneyim</div>
             </div>
           </div>
         </div>

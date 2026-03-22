@@ -13,10 +13,10 @@ All colors MUST be HSL.
     --foreground: 150 25% 20%;
 
     /* Cards with subtle warmth */
-    --card: 0 0% 100%;
+    --card: 40 30% 96%;
     --card-foreground: 150 25% 20%;
 
-    --popover: 0 0% 100%;
+    --popover: 40 30% 96%;
     --popover-foreground: 150 25% 20%;
 
     /* Deep forest green primary */
@@ -114,11 +114,15 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground font-body;
+    @apply bg-background text-foreground font-body font-normal text-xl;
   }
   
   h1, h2, h3, h4, h5, h6 {
     @apply font-heading;
+  }
+
+  button, [role="button"], .btn {
+    @apply text-lg;
   }
 }
 

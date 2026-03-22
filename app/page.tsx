@@ -8,51 +8,52 @@ import TestimonialCard from "@/components/TestimonialCard";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Award, Heart, Users, TrendingUp } from "lucide-react";
+import AboutSlider from "@/components/AboutSlider";
 
 const featuredClasses = [
   {
-    title: "Hatha Yoga",
-    description: "Gentle practice focusing on basic poses and breathing techniques",
-    duration: "60 min",
-    difficulty: "Beginner" as const,
-    image: "/images/hatha-yoga.jpg",
-    students: 234,
-  },
-  {
-    title: "Vinyasa Flow",
-    description: "Dynamic sequences linking breath with movement",
-    duration: "75 min",
-    difficulty: "Intermediate" as const,
-    image: "/images/vinyasa-yoga.jpg",
-    students: 189,
-  },
-  {
-    title: "Power Yoga",
-    description: "Intense workout combining strength, flexibility, and cardio",
-    duration: "90 min",
+    title: "Hand Stand Paketi",
+    description: "El duruşu hedefleyen kapsamlı bir güç ve denge programı",
+    duration: "8 hafta",
     difficulty: "Advanced" as const,
-    image: "/images/power-yoga.jpg",
-    students: 156,
+    image: "/images/handstand.png",
+    price: "21.500 ₺",
+  },
+  {
+    title: "Kundalini Paketi",
+    description: "Enerjiyi uyandıran nefes, hareket ve meditasyon pratikleri",
+    duration: "4 hafta",
+    difficulty: "Intermediate" as const,
+    image: "/images/kundalini.jpg",
+    price: "7.900 ₺",
+  },
+  {
+    title: "Streching Paketi",
+    description: "Kasları derinlemesine açan ve esnekliği artıran esnetme programı",
+    duration: "4 hafta",
+    difficulty: "Beginner" as const,
+    image: "/images/streching3.jpg",
+    price: "9.900 ₺",
   },
 ];
 
 const testimonials = [
   {
-    name: "Sarah Mitchell",
-    role: "Yoga Enthusiast",
-    content: "Serenity Yoga transformed my life. The instructors are knowledgeable and the community is so supportive.",
+    name: "Ayşe Yılmaz",
+    role: "Yoga Tutkunu",
+    content: "Aysu ile tanışmak hayatımı değiştirdi. Bana kattığı farkındalık ve güç için minnettarım.",
     rating: 5,
   },
   {
-    name: "David Chen",
-    role: "Premium Member",
-    content: "Best investment I've made in my wellness journey. The live sessions are incredible!",
+    name: "Necip Sülbü",
+    role: "Yoldaş",
+    content: "Sihir ile gerçeği birleştiren bir insan Itır. İlk tanıştığım andan itibaren bana ilham verdi ve yol gösterdi.",
     rating: 5,
   },
   {
-    name: "Emma Rodriguez",
-    role: "Beginner Yogi",
-    content: "As a complete beginner, I felt welcomed and guided every step of the way.",
+    name: "Elif Demir",
+    role: "Yeni Başlayan",
+    content: "Tamamen yeni başlayan biri olarak kendimi her adımda karşılanmış ve yönlendirilmiş hissettim.",
     rating: 5,
   },
 ];
@@ -60,23 +61,18 @@ const testimonials = [
 const benefits = [
   {
     icon: Heart,
-    title: "Holistic Wellness",
-    description: "Improve physical and mental health through mindful practice",
+    title: "Bütünsel Sağlık",
+    description: "Bilinçli pratik ile fiziksel ve zihinsel sağlığınızı geliştirin",
   },
   {
     icon: Users,
-    title: "Community",
-    description: "Join a supportive community of like-minded individuals",
-  },
-  {
-    icon: Award,
-    title: "Expert Guidance",
-    description: "Learn from certified instructors with years of experience",
+    title: "Topluluk",
+    description: "Benzer düşünen bireylerden oluşan destekleyici bir topluluğa katılın",
   },
   {
     icon: TrendingUp,
-    title: "Track Progress",
-    description: "Monitor your journey with personalized analytics",
+    title: "İlerleme Takibi",
+    description: "Kişiselleştirilmiş analizlerle yolculuğunuzu izleyin",
   },
 ];
 
@@ -86,13 +82,42 @@ export default function HomePage() {
       <Navbar />
       <Hero />
 
-      {/* Featured Classes */}
+      {/* Hakkımda */}
+      <section className="py-20 bg-muted/30">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <AboutSlider />
+            <div className="space-y-6 animate-slide-up">
+              <h2 className="text-4xl font-bold">Hakkımda</h2>
+              <p className="text-lg text-foreground/80">
+                On yılı aşkın özveriyle sürdürdüğüm pratik ve eğitimle, binlerce öğrenciye
+                yoga yolculuklarında rehberlik etme ayrıcalığına sahip oldum. Yaklaşımım,
+                dönüştürücü bir deneyim yaratmak için geleneksel bilgeliği modern sağlık
+                bilimiyle harmanlamak üzerine.
+              </p>
+              <p className="text-lg text-foreground/80">
+                Yoganın sadece fiziksel pozlardan ibaret olmadığına inanıyorum — yoga zihni, bedeni
+                ve ruhu besleyen bütünsel bir pratiktir. İster tamamen yeni başlayan olun ister
+                deneyimli bir uygulayıcı, derslerim sizi olduğunuz yerde karşılamak için
+                tasarlanmıştır.
+              </p>
+              <div className="pt-2">
+                <Link href="/about">
+                  <Button variant="outline">Daha Fazla Bilgi</Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Öne Çıkan Dersler */}
       <section className="py-20 bg-background">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 animate-fade-in">
-            <h2 className="text-4xl font-bold mb-4">Featured Classes</h2>
+            <h2 className="text-4xl font-bold mb-4">Öne Çıkan Dersler</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Explore our most popular yoga sessions designed for all skill levels
+              En popüler yoga derslerimi keşfedin. Her ders birebir ve online olarak sunulur.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -105,20 +130,20 @@ export default function HomePage() {
           <div className="text-center mt-12">
             <Link href="/classes">
               <Button size="lg" variant="outline">
-                View All Classes
+                Tüm Dersleri Gör
               </Button>
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Benefits */}
+      {/* Avantajlar - geçici olarak gizlendi
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 animate-fade-in">
-            <h2 className="text-4xl font-bold mb-4">Why Choose Serenity Yoga?</h2>
+            <h2 className="text-4xl font-bold mb-4">Neden Bizi Tercih Etmelisiniz?</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Experience transformative benefits that go beyond the mat
+              Matın ötesine geçen dönüştürücü faydaları deneyimleyin.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -141,41 +166,47 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+      */}
 
-      {/* Testimonials */}
-      <section className="py-20 bg-background">
-        <div className="container mx-auto px-4">
+      {/* Öğrenci Yorumları */}
+      <section className="relative py-20">
+        <div
+          className="absolute inset-0 bg-cover bg-center md:bg-fixed"
+          style={{ backgroundImage: "url('/images/2.jpg')" }}
+        />
+        <div className="absolute inset-0 bg-black/60" />
+        <div className="relative container mx-auto px-4">
           <div className="text-center mb-12 animate-fade-in">
-            <h2 className="text-4xl font-bold mb-4">What Our Students Say</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Join thousands of satisfied students on their wellness journey
+            <h2 className="text-4xl font-bold mb-4 text-white/85">Beni Öğrencilerimden Duyun</h2>
+            <p className="text-white/70 max-w-2xl mx-auto">
+              Bu yolculukta bana katılan öğrencilerimin deneyimlerini keşfedin.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {testimonials.map((testimonial, index) => (
               <div key={index} className="animate-slide-up" style={{ animationDelay: `${index * 0.1}s` }}>
-                <TestimonialCard {...testimonial} />
+                <TestimonialCard {...testimonial} glass />
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
+      {/* CTA Bölümü */}
       <section className="py-20 bg-primary text-primary-foreground">
         <div className="container mx-auto px-4 text-center">
           <div className="max-w-3xl mx-auto animate-fade-in">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              Begin Your Transformation Today
+              Dönüşümüne Bugün Başla
             </h2>
             <p className="text-lg mb-8 text-primary-foreground/90">
-              Join our community and start your journey towards a healthier, more balanced life.
-              First 7 days are completely free.
+              Topluluğuma katılın ve daha sağlıklı, daha dengeli bir yaşama doğru yolculuğunuza başlayın.
+          
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/pricing">
                 <Button size="lg" variant="secondary" className="w-full sm:w-auto">
-                  View Pricing Plans
+                  Fiyat Planlarını Gör
                 </Button>
               </Link>
               <Link href="/contact">
@@ -184,7 +215,7 @@ export default function HomePage() {
                   variant="outline"
                   className="w-full sm:w-auto bg-white/10 backdrop-blur-sm border-white/30 text-white hover:bg-white/20"
                 >
-                  Contact Us
+                  Bana Ulaşın
                 </Button>
               </Link>
             </div>

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Poppins } from "next/font/google";
+import { Playfair_Display, Poppins, Tangerine, Cormorant_Garamond } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import Providers from "./providers";
 import "./globals.css";
@@ -18,15 +18,29 @@ const poppins = Poppins({
   display: "swap",
 });
 
+const tangerine = Tangerine({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  variable: "--font-script",
+  display: "swap",
+});
+
+const cormorantGaramond = Cormorant_Garamond({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-elegant",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
-  title: "Serenity Yoga | Transform Your Mind & Body",
+  title: "Aysu Itır Karaçam | Yoga ile Bedenini ve Zihnini Dönüştür",
   description:
-    "Join Serenity Yoga for transformative yoga lessons. Subscribe to premium plans for live and recorded sessions. Start your wellness journey today.",
-  authors: [{ name: "Serenity Yoga" }],
+    "Aysu Itır Karaçam ile dönüştürücü yoga dersleri. Canlı ve kayıtlı dersler için premium planlara abone olun. Sağlık yolculuğunuza bugün başlayın.",
+  authors: [{ name: "Aysu Itır Karaçam" }],
   openGraph: {
-    title: "Serenity Yoga | Transform Your Mind & Body",
+    title: "Aysu Itır Karaçam | Yoga ile Bedenini ve Zihnini Dönüştür",
     description:
-      "Join Serenity Yoga for transformative yoga lessons. Subscribe to premium plans for live and recorded sessions.",
+      "Aysu Itır Karaçam ile dönüştürücü yoga dersleri. Canlı ve kayıtlı dersler için premium planlara abone olun.",
     type: "website",
     images: ["https://lovable.dev/opengraph-image-p98pqg.png"],
   },
@@ -43,8 +57,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={`${playfairDisplay.variable} ${poppins.variable}`}>
+    <html lang="tr">
+      <body className={`${playfairDisplay.variable} ${poppins.variable} ${tangerine.variable} ${cormorantGaramond.variable}`}>
         <Providers>
           {children}
         </Providers>

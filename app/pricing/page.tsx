@@ -1,101 +1,130 @@
+"use client";
+
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PricingCard from "@/components/PricingCard";
 import { Check } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { formatPrice } from "@/lib/utils";
 
-const plans = [
+interface Product {
+  id: string;
+  name: string;
+  description: string | null;
+  price: number;
+  features: string[];
+}
+
+const fallbackPlans = [
   {
-    title: "Free Trial",
-    price: "Free",
-    description: "Perfect for trying out our platform",
+    title: "Ücretsiz Deneme",
+    price: "Ücretsiz",
+    description: "Platformumu denemek için mükemmel başlangıç",
     features: [
-      "7 days full access",
-      "Access to 1 live class",
-      "3 recorded sessions",
-      "Basic progress tracking",
-      "Community forum access",
+      "7 gün tam erişim",
+      "1 canlı derse katılım",
+      "3 kayıtlı ders",
+      "Temel ilerleme takibi",
+      "Topluluk forumuna erişim",
     ],
-    buttonText: "Start Free Trial",
+    buttonText: "Ücretsiz Deneyin",
   },
   {
-    title: "Standard",
-    price: "₹799",
-    description: "For dedicated practitioners",
+    title: "Standart",
+    price: "₺4.900",
+    description: "Düzenli pratik yapanlar için",
     features: [
-      "Unlimited recorded sessions",
-      "5 live classes per month",
-      "Advanced progress tracking",
-      "Downloadable resources",
-      "Priority email support",
-      "Monthly wellness newsletter",
+      "Sınırsız kayıtlı ders",
+      "Ayda 4 grup canlı dersi",
+      "Gelişmiş ilerleme takibi",
+      "İndirilebilir kaynaklar",
+      "Öncelikli e-posta desteği",
+      "Aylık sağlık bülteni",
     ],
-    isPopular: false,
-    buttonText: "Get Started",
+    buttonText: "Başla",
   },
   {
     title: "Premium",
-    price: "₹1,499",
-    description: "The complete wellness experience",
+    price: "₺9.900",
+    description: "Eksiksiz sağlık deneyimi",
     features: [
-      "Everything in Standard",
-      "Unlimited live sessions",
-      "1-on-1 monthly consultation",
-      "Personalized practice plans",
-      "Exclusive workshops & retreats",
-      "Early access to new content",
-      "Priority booking",
-      "Custom diet recommendations",
+      "Standart'taki her şey",
+      "Tüm grup canlı derslere erişim",
+      "Aylık 1'e 1 danışmanlık",
+      "Kişiselleştirilmiş pratik planları",
+      "Yüzyüze kamplara özel indirimler",
+      "Yeni içeriklere erken erişim",
+      "Öncelikli rezervasyon",
+      "Kişiye özel beslenme önerileri",
     ],
     isPopular: true,
-    buttonText: "Go Premium",
+    buttonText: "Premium'a Geç",
   },
 ];
 
 const faqs = [
   {
-    question: "Can I cancel my subscription anytime?",
-    answer: "Yes, you can cancel your subscription at any time. Your access will continue until the end of your billing period.",
+    question: "Aboneliğimi istediğim zaman iptal edebilir miyim?",
+    answer: "Evet, aboneliğinizi istediğiniz zaman iptal edebilirsiniz. Erişiminiz fatura döneminizin sonuna kadar devam eder.",
   },
   {
-    question: "Do I need any equipment?",
-    answer: "All you need is a yoga mat and comfortable clothing. Props like blocks and straps are optional but can enhance your practice.",
+    question: "Herhangi bir ekipmana ihtiyacım var mı?",
+    answer: "Tek ihtiyacınız bir yoga matı ve rahat kıyafetler. Blok ve kayış gibi yardımcı araçlar isteğe bağlıdır ancak pratiğinizi zenginleştirebilir.",
   },
   {
-    question: "Are classes suitable for beginners?",
-    answer: "Absolutely! We offer classes for all levels, from complete beginners to advanced practitioners.",
+    question: "Dersler yeni başlayanlar için uygun mu?",
+    answer: "Kesinlikle! Tamamen yeni başlayanlardan ileri düzey uygulayıcılara kadar her seviye için dersler sunuyorum.",
   },
   {
-    question: "What's included in the live sessions?",
-    answer: "Live sessions include real-time instruction, the ability to ask questions, and personalized feedback from our instructor.",
+    question: "Canlı derslere neler dahil?",
+    answer: "Canlı dersler gerçek zamanlı eğitim, soru sorma imkanı ve eğitmenimizden kişiselleştirilmiş geri bildirim içerir.",
   },
 ];
 
 export default function PricingPage() {
+  const { data: products } = useQuery<Product[]>({
+    queryKey: ["products", "subscription"],
+    queryFn: () => fetch("/api/products?type=subscription").then((r) => r.json()),
+  });
+
+  // API'den gelen ürünleri PricingCard formatına çevir
+  const plans = products && products.length > 0
+    ? products.map((p, index) => ({
+        title: p.name,
+        price: formatPrice(p.price),
+        description: p.description || "",
+        features: p.features,
+        isPopular: index === products.length - 1, // en pahalısı popüler
+        buttonText: p.price === 0 ? "Ücretsiz Deneyin" : "Başla",
+        productId: p.id,
+      }))
+    : fallbackPlans;
+
   return (
     <div className="min-h-screen">
       <Navbar />
 
-      {/* Hero Section */}
+      {/* Hero Bölümü */}
       <section className="pt-32 pb-16 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto animate-fade-in">
-            <h1 className="text-5xl md:text-6xl font-bold mb-6">Choose Your Plan</h1>
+            <h1 className="text-5xl md:text-6xl font-bold mb-6">Planınızı Seçin</h1>
             <p className="text-xl text-muted-foreground">
-              Start your wellness journey today with a plan that fits your lifestyle.
-              All plans include access to our supportive community.
+              Yaşam tarzınıza uygun bir planla yoga yolculuğunuza bugün başlayın.
+              Tüm planlar destekleyici topluluk platformuna erişim içerir.
             </p>
           </div>
         </div>
       </section>
 
-      {/* Pricing Cards */}
+      {/* Fiyat Kartları */}
       <section className="py-20">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <div className="flex flex-wrap justify-center gap-8 max-w-6xl mx-auto">
             {plans.map((plan, index) => (
               <div
                 key={index}
-                className="animate-slide-up"
+                className="animate-slide-up w-full md:w-[calc(33.333%-1.5rem)]"
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
                 <PricingCard {...plan} />
@@ -103,60 +132,60 @@ export default function PricingPage() {
             ))}
           </div>
 
-          {/* Money-back guarantee */}
+          {/* Para iade garantisi */}
           <div className="text-center mt-12 animate-fade-in">
             <div className="inline-flex items-center gap-2 px-6 py-3 bg-secondary/20 rounded-full">
               <Check className="text-secondary" size={20} />
-              <span className="text-sm font-medium">30-day money-back guarantee</span>
+              <span className="text-sm font-medium">30 gün para iade garantisi</span>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Comparison Table */}
+      {/* Karşılaştırma Tablosu */}
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-4xl font-bold text-center mb-12 animate-fade-in">
-              Compare Plans
+              Planları Karşılaştırın
             </h2>
             <div className="bg-card rounded-xl shadow-[var(--shadow-soft)] overflow-hidden">
               <table className="w-full">
                 <thead className="bg-primary text-primary-foreground">
                   <tr>
-                    <th className="text-left p-4">Feature</th>
-                    <th className="text-center p-4">Free Trial</th>
-                    <th className="text-center p-4">Standard</th>
-                    <th className="text-center p-4">Premium</th>
+                    <th className="text-left p-4">Özellik</th>
+                    {plans.map((plan, i) => (
+                      <th key={i} className="text-center p-4">{plan.title}</th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
                   <tr>
-                    <td className="p-4">Recorded Sessions</td>
+                    <td className="p-4">Kayıtlı Dersler</td>
                     <td className="text-center p-4">3</td>
-                    <td className="text-center p-4">Unlimited</td>
-                    <td className="text-center p-4">Unlimited</td>
+                    <td className="text-center p-4">Sınırsız</td>
+                    <td className="text-center p-4">Sınırsız</td>
                   </tr>
                   <tr>
-                    <td className="p-4">Live Classes</td>
+                    <td className="p-4">Canlı Dersler</td>
                     <td className="text-center p-4">1</td>
-                    <td className="text-center p-4">5/month</td>
-                    <td className="text-center p-4">Unlimited</td>
+                    <td className="text-center p-4">Ayda 5</td>
+                    <td className="text-center p-4">Sınırsız</td>
                   </tr>
                   <tr>
-                    <td className="p-4">Progress Tracking</td>
+                    <td className="p-4">İlerleme Takibi</td>
                     <td className="text-center p-4"><Check className="mx-auto text-secondary" size={20} /></td>
                     <td className="text-center p-4"><Check className="mx-auto text-secondary" size={20} /></td>
                     <td className="text-center p-4"><Check className="mx-auto text-secondary" size={20} /></td>
                   </tr>
                   <tr>
-                    <td className="p-4">1-on-1 Consultation</td>
+                    <td className="p-4">1'e 1 Danışmanlık</td>
                     <td className="text-center p-4">-</td>
                     <td className="text-center p-4">-</td>
                     <td className="text-center p-4"><Check className="mx-auto text-secondary" size={20} /></td>
                   </tr>
                   <tr>
-                    <td className="p-4">Personalized Plans</td>
+                    <td className="p-4">Kişisel Planlar</td>
                     <td className="text-center p-4">-</td>
                     <td className="text-center p-4">-</td>
                     <td className="text-center p-4"><Check className="mx-auto text-secondary" size={20} /></td>
@@ -168,12 +197,12 @@ export default function PricingPage() {
         </div>
       </section>
 
-      {/* FAQs */}
+      {/* SSS */}
       <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto">
             <h2 className="text-4xl font-bold text-center mb-12 animate-fade-in">
-              Frequently Asked Questions
+              Sıkça Sorulan Sorular
             </h2>
             <div className="space-y-6">
               {faqs.map((faq, index) => (

@@ -15,7 +15,7 @@ export default {
     extend: {
       fontFamily: {
         heading: ['var(--font-heading)', 'Playfair Display', 'serif'],
-        body: ['var(--font-body)', 'Poppins', 'sans-serif'],
+        body: ['var(--font-elegant)', 'Cormorant Garamond', 'serif'],
       },
       colors: {
         border: "hsl(var(--border))",

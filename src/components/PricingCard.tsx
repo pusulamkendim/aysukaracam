@@ -17,13 +17,13 @@ const PricingCard = ({
   description, 
   features, 
   isPopular = false,
-  buttonText = "Get Started"
+  buttonText = "Başla"
 }: PricingCardProps) => {
   return (
     <Card className={`relative overflow-hidden ${isPopular ? 'border-primary shadow-[var(--shadow-hover)]' : ''}`}>
       {isPopular && (
         <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-3 py-1 text-xs font-semibold">
-          POPULAR
+          POPÜLER
         </div>
       )}
       <CardHeader className="text-center">
@@ -31,7 +31,7 @@ const PricingCard = ({
         <CardDescription>{description}</CardDescription>
         <div className="mt-4">
           <span className="text-4xl font-bold font-heading">{price}</span>
-          {price !== "Free" && <span className="text-muted-foreground">/month</span>}
+          {price !== "Ücretsiz" && <span className="text-muted-foreground">/ay</span>}
         </div>
       </CardHeader>
       <CardContent className="space-y-4">

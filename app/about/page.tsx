@@ -1,19 +1,19 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import AboutSlider from "@/components/AboutSlider";
 import { Award, Heart, Users, Star } from "lucide-react";
 
 const certifications = [
-  "200-Hour RYT Certified",
-  "Advanced Vinyasa Specialist",
-  "Meditation & Mindfulness Coach",
-  "Prenatal Yoga Certified",
+  "200 Saat RYT Sertifikalı",
+  "İleri Düzey Vinyasa Uzmanı",
+  "Meditasyon & Farkındalık Koçu",
 ];
 
 const achievements = [
-  { icon: Users, label: "500+ Students", value: "Taught" },
-  { icon: Award, label: "10+ Years", value: "Experience" },
-  { icon: Heart, label: "10,000+ Hours", value: "Practice" },
-  { icon: Star, label: "4.9/5", value: "Rating" },
+  { icon: Users, label: "500+ Öğrenci", value: "Eğitim" },
+  { icon: Award, label: "10+ Yıl", value: "Deneyim" },
+  { icon: Heart, label: "10.000+ Saat", value: "Pratik" },
+  { icon: Star, label: "4.9/5", value: "Puan" },
 ];
 
 export default function AboutPage() {
@@ -21,43 +21,39 @@ export default function AboutPage() {
     <div className="min-h-screen">
       <Navbar />
 
-      {/* Hero Section */}
+      {/* Hero Bölümü */}
       <section className="pt-32 pb-16 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto animate-fade-in">
-            <h1 className="text-5xl md:text-6xl font-bold mb-6">Meet Your Instructor</h1>
+            <h1 className="text-5xl md:text-6xl font-bold mb-6">Eğitmeninizle Tanışın</h1>
             <p className="text-xl text-muted-foreground">
-              Dedicated to guiding you on your journey to wellness, balance, and inner peace
+              Sağlık, denge ve iç huzur yolculuğunuzda size rehberlik etmeye hazırım.
             </p>
           </div>
         </div>
       </section>
 
-      {/* Main Content */}
+      {/* Ana İçerik */}
       <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="animate-fade-in">
-              <img
-                src="/images/instructor.jpg"
-                alt="Yoga instructor profile"
-                className="rounded-2xl shadow-[var(--shadow-soft)] w-full max-w-md mx-auto"
-              />
-            </div>
+            <AboutSlider />
             <div className="space-y-6 animate-slide-up">
-              <h2 className="text-4xl font-bold">About Maya Patel</h2>
+              <h2 className="text-4xl font-bold">Aysu Itır Karaçam Hakkında</h2>
               <p className="text-lg text-foreground/80">
-                With over a decade of dedicated practice and teaching, I've had the privilege of
-                guiding thousands of students on their yoga journey. My approach blends traditional
-                wisdom with modern wellness science to create a transformative experience.
+                On yılı aşkın özveriyle sürdürdüğüm pratik ve eğitimle, binlerce öğrenciye
+                yoga yolculuklarında rehberlik etme ayrıcalığına sahip oldum. Yaklaşımım,
+                dönüştürücü bir deneyim yaratmak için geleneksel bilgeliği modern sağlık
+                bilimiyle harmanlar.
               </p>
               <p className="text-lg text-foreground/80">
-                I believe yoga is more than just physical poses—it's a holistic practice that
-                nurtures the mind, body, and spirit. Whether you're a complete beginner or an
-                experienced practitioner, my classes are designed to meet you where you are.
+                Yoganın sadece fiziksel pozlardan ibaret olmadığına inanıyorum — zihni, bedeni
+                ve ruhu besleyen bütünsel bir pratiktir. İster tamamen yeni başlayan olun ister
+                deneyimli bir uygulayıcı, derslerim sizi olduğunuz yerde karşılamak için
+                tasarlanmıştır.
               </p>
               <div className="pt-4">
-                <h3 className="text-2xl font-semibold mb-4">Certifications</h3>
+                <h3 className="text-2xl font-semibold mb-4">Sertifikalar</h3>
                 <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {certifications.map((cert, index) => (
                     <li key={index} className="flex items-center gap-2">
@@ -72,7 +68,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Stats Section */}
+      {/* İstatistikler */}
       <section className="py-20 bg-primary text-primary-foreground">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
@@ -94,33 +90,34 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Philosophy Section */}
+      {/* Öğretim Felsefesi */}
       <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-4xl font-bold text-center mb-12 animate-fade-in">
-              My Teaching Philosophy
+              Öğretim Felsefem
             </h2>
             <div className="space-y-8">
               <div className="p-8 rounded-xl bg-muted/30 animate-slide-up">
-                <h3 className="text-2xl font-semibold mb-4">Mindful Movement</h3>
+                <h3 className="text-2xl font-semibold mb-4">Bilinçli Hareket</h3>
                 <p className="text-foreground/80">
-                  Every practice is an opportunity to connect with yourself. I emphasize
-                  mindful movement that honors your body's unique capabilities and limitations.
+                  Her pratik, kendinizle bağlantı kurma fırsatıdır. Bedeninizin benzersiz
+                  yeteneklerini ve sınırlarını onurlandıran bilinçli hareketi vurguluyorum.
                 </p>
               </div>
               <div className="p-8 rounded-xl bg-muted/30 animate-slide-up" style={{ animationDelay: '0.1s' }}>
-                <h3 className="text-2xl font-semibold mb-4">Breath as Foundation</h3>
+                <h3 className="text-2xl font-semibold mb-4">Temel Olarak Nefes</h3>
                 <p className="text-foreground/80">
-                  The breath is the bridge between body and mind. Through pranayama and
-                  conscious breathing, we unlock deeper levels of awareness and peace.
+                  Nefes, beden ile zihin arasındaki köprüdür. Pranayama ve bilinçli nefes
+                  aracılığıyla daha derin farkındalık ve huzur seviyelerine ulaşırız.
                 </p>
               </div>
               <div className="p-8 rounded-xl bg-muted/30 animate-slide-up" style={{ animationDelay: '0.2s' }}>
-                <h3 className="text-2xl font-semibold mb-4">Community & Support</h3>
+                <h3 className="text-2xl font-semibold mb-4">Topluluk & Destek</h3>
                 <p className="text-foreground/80">
-                  Yoga is a journey best shared. I cultivate a warm, inclusive environment
-                  where everyone feels welcome, supported, and empowered to grow.
+                  Yoga, paylaşıldığında en güzel yolculuktur. Herkesin kendini hoş karşılanmış,
+                  desteklenmiş ve büyümeye güçlendirilmiş hissettiği sıcak, kapsayıcı bir
+                  ortam oluşturuyorum.
                 </p>
               </div>
             </div>
