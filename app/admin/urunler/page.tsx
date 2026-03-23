@@ -87,7 +87,7 @@ function ProductTable({
               <th className="p-4">Fiyat</th>
               <th className="p-4">Shopier</th>
               <th className="p-4">Sipariş</th>
-              <th className="p-4 sticky right-0 bg-card">İşlem</th>
+              <th className="p-4">İşlem</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
@@ -118,7 +118,7 @@ function ProductTable({
                   )}
                 </td>
                 <td className="p-4">{product._count.orderItems}</td>
-                <td className="p-4 sticky right-0 bg-card">
+                <td className="p-4">
                   <div className="flex gap-2">
                     <Button variant="ghost" size="icon" onClick={() => onEdit(product)}>
                       <Pencil size={16} />
@@ -219,7 +219,7 @@ export default function ProductsPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <h1 className="text-3xl font-bold">Ürünler</h1>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>

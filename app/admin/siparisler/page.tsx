@@ -75,7 +75,7 @@ export default function OrdersPage() {
                   <th className="p-4">Tutar</th>
                   <th className="p-4">Tarih</th>
                   <th className="p-4">Shopier</th>
-                  <th className="p-4 sticky right-0 bg-card">Durum</th>
+                  <th className="p-4">Durum</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -105,7 +105,7 @@ export default function OrdersPage() {
                         "-"
                       )}
                     </td>
-                    <td className="p-4 sticky right-0 bg-card">
+                    <td className="p-4">
                       <Select
                         value={order.status}
                         onValueChange={(v) => updateStatus.mutate({ id: order.id, status: v })}

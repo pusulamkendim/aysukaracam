@@ -138,7 +138,7 @@ export default function MembersPage() {
                   <th className="p-4">Kayıt</th>
                   <th className="p-4">Sipariş</th>
                   <th className="p-4">Katılım</th>
-                  <th className="p-4 sticky right-0 bg-card">İşlem</th>
+                  <th className="p-4">İşlem</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -165,7 +165,7 @@ export default function MembersPage() {
                     </td>
                     <td className="p-4">{user._count.orders}</td>
                     <td className="p-4">{user._count.enrollments}</td>
-                    <td className="p-4 sticky right-0 bg-card">
+                    <td className="p-4">
                       <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
                         <Button
                           variant="ghost"
@@ -204,7 +204,7 @@ export default function MembersPage() {
 
       {/* Kullanıcı Detay Dialog */}
       <Dialog open={!!selectedUserId} onOpenChange={(open) => !open && setSelectedUserId(null)}>
-        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl">
           <DialogHeader className="sr-only">
             <DialogTitle>Üye Detayı</DialogTitle>
           </DialogHeader>
