@@ -86,19 +86,9 @@ async function handleOrderCreated(order: {
   const buyerEmail = order.shippingInfo?.email || order.billingInfo?.email || "";
   const isPaid = order.paymentStatus === "paid";
 
-  console.log("order.created:", { shopierOrderId, buyerEmail, isPaid });
+  console.log("order.created:", { shopierOrderId, buyerEmail, isPaid, lineItems: order.lineItems });
 
-  if (!buyerEmail || !isPaid) return;
-
-  // Kullanıcıyı bul
-  const user = await prisma.user.findUnique({
-    where: { email: buyerEmail.toLowerCase() },
-  });
-
-  if (!user) {
-    console.log("Shopier webhook: kullanıcı bulunamadı:", buyerEmail);
-    return;
-  }
+  if (!isPaid) return;
 
   // Shopier productId ile eşleşen ürünleri bul
   const shopierProductIds = (order.lineItems || []).map((item) => item.productId);
@@ -107,6 +97,32 @@ async function handleOrderCreated(order: {
         where: { gumroadId: { in: shopierProductIds } },
       })
     : [];
+
+  // 1. Email ile kullanıcıyı bul
+  let user = buyerEmail
+    ? await prisma.user.findUnique({ where: { email: buyerEmail.toLowerCase() } })
+    : null;
+
+  // 2. Email eşleşmezse, ürünü PENDING siparişte arayan kullanıcıyı bul
+  if (!user && matchedProducts.length > 0) {
+    const pendingOrder = await prisma.order.findFirst({
+      where: {
+        status: "PENDING",
+        items: { some: { productId: { in: matchedProducts.map((p) => p.id) } } },
+      },
+      orderBy: { createdAt: "desc" },
+      include: { user: true },
+    });
+    if (pendingOrder) {
+      user = pendingOrder.user;
+      console.log("Shopier webhook: email eşleşmedi, PENDING sipariş ile eşleştirildi:", user.email);
+    }
+  }
+
+  if (!user) {
+    console.log("Shopier webhook: kullanıcı bulunamadı:", buyerEmail, "productIds:", shopierProductIds);
+    return;
+  }
 
   // Bekleyen siparişi bul veya yeni oluştur
   let dbOrder = await prisma.order.findFirst({
