@@ -101,6 +101,12 @@ function LoginContent() {
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? "Giriş yapılıyor..." : "Giriş Yap"}
                 </Button>
+
+                <div className="text-right">
+                  <Link href="/auth/sifre-unuttum" className="text-xs text-muted-foreground hover:text-primary">
+                    Şifremi unuttum
+                  </Link>
+                </div>
               </form>
 
               <div className="relative my-6">

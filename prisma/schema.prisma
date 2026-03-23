@@ -36,11 +36,12 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  accounts    Account[]
-  sessions    Session[]
-  orders      Order[]
-  enrollments Enrollment[]
-  cartItems   CartItem[]
+  accounts         Account[]
+  sessions         Session[]
+  orders           Order[]
+  enrollments      Enrollment[]
+  cartItems        CartItem[]
+  groupMemberships GroupMember[]
 }
 
 model Account {
@@ -145,6 +146,7 @@ model Class {
   description   String?
   type          ClassType @default(LIVE)
   productId     String?
+  groupId       String?
   scheduledAt   DateTime?
   duration      Int?
   zoomMeetingId String?
@@ -156,6 +158,7 @@ model Class {
   updatedAt     DateTime  @updatedAt
 
   product     Product?     @relation(fields: [productId], references: [id])
+  group       Group?       @relation(fields: [groupId], references: [id], onDelete: SetNull)
   enrollments Enrollment[]
 }
 
@@ -164,10 +167,33 @@ model Enrollment {
   userId    String
   classId   String
   attended  Boolean  @default(false)
+  source    String?  // null = manual, "group" = added via group sync
   createdAt DateTime @default(now())
 
   user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
   class Class @relation(fields: [classId], references: [id], onDelete: Cascade)
 
   @@unique([userId, classId])
+}
+
+model Group {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  members GroupMember[]
+  classes Class[]
+}
+
+model GroupMember {
+  id        String   @id @default(cuid())
+  groupId   String
+  userId    String
+  createdAt DateTime @default(now())
+
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, userId])
 }

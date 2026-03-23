@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, Pencil, Trash2, Video, Users, Search, Repeat, MessageCircle } from "lucide-react";
+import { Plus, Pencil, Trash2, Video, Users, UsersRound, Search, Repeat, MessageCircle } from "lucide-react";
 import DateTimePicker from "@/components/DateTimePicker";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -46,9 +46,18 @@ interface ClassItem {
   recordingUrl: string | null;
   isActive: boolean;
   productId: string | null;
+  groupId: string | null;
   product: { name: string } | null;
-  enrollments: { user: EnrolledUser }[];
+  group: { id: string; name: string; members: { user: EnrolledUser }[] } | null;
+  enrollments: { user: EnrolledUser; source: string | null }[];
   _count: { enrollments: number };
+}
+
+interface GroupItem {
+  id: string;
+  name: string;
+  members: { user: { id: string; name: string | null; email: string } }[];
+  _count: { members: number };
 }
 
 interface Product {
@@ -71,6 +80,7 @@ interface FormState {
   duration: number;
   recordingUrl: string;
   enrolledUserIds: string[];
+  groupId: string;
   repeatWeeks: number;
   createZoom: boolean;
 }
@@ -95,6 +105,7 @@ const emptyClass: FormState = {
   duration: 60,
   recordingUrl: "",
   enrolledUserIds: [],
+  groupId: "",
   repeatWeeks: 1,
   createZoom: true,
 };
@@ -160,50 +171,122 @@ function ClassTable({
                 </td>
                 <td className="p-4">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-medium">{cls._count.enrollments}</span>
-                    {cls.enrollments.length > 0 && (
-                      <>
-                        <div className="flex flex-wrap gap-1">
-                          {cls.enrollments.slice(0, 5).map((e) => {
-                            const dateStr = cls.scheduledAt
-                              ? new Date(cls.scheduledAt).toLocaleDateString("tr-TR", {
-                                  day: "numeric", month: "long", weekday: "long",
-                                  hour: "2-digit", minute: "2-digit",
-                                })
-                              : "";
-                            const message = encodeURIComponent(
-                              `Merhaba ${e.user.name || ""}! 🧘\n\n` +
-                              `"${cls.title}" dersiniz hakkında bilgilendirme:\n` +
-                              (dateStr ? `📅 ${dateStr}\n` : "") +
-                              (cls.duration ? `⏱ ${cls.duration} dakika\n` : "") +
-                              (cls.zoomJoinUrl ? `\n🔗 Zoom: ${cls.zoomJoinUrl}\n` : "") +
-                              `\nGörüşmek üzere!`
-                            );
-                            const phone = e.user.phone?.replace(/\D/g, "") || "";
-                            const waUrl = phone ? `https://wa.me/${phone}?text=${message}` : null;
+                    {/* Grup badge — tıklayınca üyeleri gösterir */}
+                    {cls.group && (
+                      <details className="relative">
+                        <summary className="list-none cursor-pointer">
+                          <Badge variant="default" className="text-xs gap-1 cursor-pointer">
+                            <UsersRound size={10} />
+                            {cls.group.name} ({cls.group.members.length})
+                          </Badge>
+                        </summary>
+                        <div className="absolute z-20 top-full left-0 mt-1 w-64 p-3 rounded-lg border border-border bg-card shadow-lg">
+                          <p className="text-xs font-semibold mb-2">{cls.group.name} Üyeleri</p>
+                          <div className="space-y-1.5 max-h-48 overflow-y-auto">
+                            {cls.group.members.map((m) => {
+                              const phone = m.user.phone?.replace(/\D/g, "") || "";
+                              const dateStr = cls.scheduledAt
+                                ? new Date(cls.scheduledAt).toLocaleDateString("tr-TR", {
+                                    day: "numeric", month: "long", weekday: "long",
+                                    hour: "2-digit", minute: "2-digit",
+                                  })
+                                : "";
+                              const message = encodeURIComponent(
+                                `Merhaba ${m.user.name || ""}! 🧘\n\n` +
+                                `"${cls.title}" dersiniz hakkında bilgilendirme:\n` +
+                                (dateStr ? `📅 ${dateStr}\n` : "") +
+                                (cls.duration ? `⏱ ${cls.duration} dakika\n` : "") +
+                                (cls.zoomJoinUrl ? `\n🔗 Zoom: ${cls.zoomJoinUrl}\n` : "") +
+                                `\nGörüşmek üzere!`
+                              );
+                              const waUrl = phone ? `https://wa.me/${phone}?text=${message}` : null;
+                              return (
+                                <div key={m.user.id} className="flex items-center justify-between">
+                                  <span className="text-xs truncate">{m.user.name || m.user.email}</span>
+                                  {waUrl && (
+                                    <a href={waUrl} target="_blank" rel="noopener noreferrer">
+                                      <MessageCircle size={12} className="text-primary hover:text-primary/70" />
+                                    </a>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="text-xs h-6 gap-1 w-full mt-2"
+                            onClick={() => {
+                              const dateStr = cls.scheduledAt
+                                ? new Date(cls.scheduledAt).toLocaleDateString("tr-TR", {
+                                    day: "numeric", month: "long", weekday: "long",
+                                    hour: "2-digit", minute: "2-digit",
+                                  })
+                                : "";
+                              const message =
+                                `🧘 "${cls.title}" dersiniz hakkında bilgilendirme:\n\n` +
+                                (dateStr ? `📅 ${dateStr}\n` : "") +
+                                (cls.duration ? `⏱ ${cls.duration} dakika\n` : "") +
+                                (cls.zoomJoinUrl ? `\n🔗 Zoom: ${cls.zoomJoinUrl}\n` : "") +
+                                `\nGörüşmek üzere!`;
+                              navigator.clipboard.writeText(message);
+                              toast.success("Mesaj panoya kopyalandı");
+                            }}
+                          >
+                            <MessageCircle size={10} />
+                            Mesajı Kopyala
+                          </Button>
+                        </div>
+                      </details>
+                    )}
+                    {/* Bireysel katılımcılar (grup üyeleri hariç) */}
+                    {(() => {
+                      const groupUserIds = cls.group ? cls.group.members.map((m) => m.user.id) : [];
+                      const individualEnrollments = cls.enrollments.filter((e) => !groupUserIds.includes(e.user.id));
+                      if (individualEnrollments.length === 0 && !cls.group) {
+                        return <span className="text-muted-foreground text-sm">-</span>;
+                      }
+                      return individualEnrollments.length > 0 ? (
+                        <>
+                          <div className="flex flex-wrap gap-1">
+                            {individualEnrollments.slice(0, 5).map((e) => {
+                              const dateStr = cls.scheduledAt
+                                ? new Date(cls.scheduledAt).toLocaleDateString("tr-TR", {
+                                    day: "numeric", month: "long", weekday: "long",
+                                    hour: "2-digit", minute: "2-digit",
+                                  })
+                                : "";
+                              const message = encodeURIComponent(
+                                `Merhaba ${e.user.name || ""}! 🧘\n\n` +
+                                `"${cls.title}" dersiniz hakkında bilgilendirme:\n` +
+                                (dateStr ? `📅 ${dateStr}\n` : "") +
+                                (cls.duration ? `⏱ ${cls.duration} dakika\n` : "") +
+                                (cls.zoomJoinUrl ? `\n🔗 Zoom: ${cls.zoomJoinUrl}\n` : "") +
+                                `\nGörüşmek üzere!`
+                              );
+                              const phone = e.user.phone?.replace(/\D/g, "") || "";
+                              const waUrl = phone ? `https://wa.me/${phone}?text=${message}` : null;
 
-                            return waUrl ? (
-                              <a key={e.user.id} href={waUrl} target="_blank" rel="noopener noreferrer">
-                                <Badge variant="secondary" className="text-xs gap-1 cursor-pointer hover:bg-secondary/80">
-                                  <MessageCircle size={10} />
+                              return waUrl ? (
+                                <a key={e.user.id} href={waUrl} target="_blank" rel="noopener noreferrer">
+                                  <Badge variant="secondary" className="text-xs gap-1 cursor-pointer hover:bg-secondary/80">
+                                    <MessageCircle size={10} />
+                                    {e.user.name || e.user.email.split("@")[0]}
+                                  </Badge>
+                                </a>
+                              ) : (
+                                <Badge key={e.user.id} variant="secondary" className="text-xs">
                                   {e.user.name || e.user.email.split("@")[0]}
                                 </Badge>
-                              </a>
-                            ) : (
-                              <Badge key={e.user.id} variant="secondary" className="text-xs">
-                                {e.user.name || e.user.email.split("@")[0]}
+                              );
+                            })}
+                            {individualEnrollments.length > 5 && (
+                              <Badge variant="outline" className="text-xs">
+                                +{individualEnrollments.length - 5}
                               </Badge>
-                            );
-                          })}
-                          {cls.enrollments.length > 5 && (
-                            <Badge variant="outline" className="text-xs">
-                              +{cls.enrollments.length - 5}
-                            </Badge>
-                          )}
-                        </div>
-                        {(() => {
-                          if (cls.enrollments.length === 0) return null;
-                          return (
+                            )}
+                          </div>
+                          {!cls.group && (
                             <Button
                               variant="outline"
                               size="sm"
@@ -228,10 +311,10 @@ function ClassTable({
                               <MessageCircle size={10} />
                               Mesajı Kopyala
                             </Button>
-                          );
-                        })()}
-                      </>
-                    )}
+                          )}
+                        </>
+                      ) : null;
+                    })()}
                   </div>
                 </td>
                 <td className="p-4">
@@ -314,6 +397,11 @@ export default function ClassesAdminPage() {
     queryFn: () => fetch("/api/admin/products").then((r) => r.json()),
   });
 
+  const { data: groups } = useQuery<GroupItem[]>({
+    queryKey: ["admin-groups"],
+    queryFn: () => fetch("/api/admin/groups").then((r) => r.json()),
+  });
+
   const { data: users } = useQuery<UserItem[]>({
     queryKey: ["admin-users-list"],
     queryFn: () => fetch("/api/admin/users").then((r) => r.json()),
@@ -330,6 +418,7 @@ export default function ClassesAdminPage() {
           ...data,
           duration: Number(data.duration),
           productId: data.productId || null,
+          groupId: data.groupId || null,
         }),
       });
       if (!res.ok) throw new Error("Kayıt başarısız");
@@ -379,6 +468,7 @@ export default function ClassesAdminPage() {
       duration: cls.duration || 60,
       recordingUrl: cls.recordingUrl || "",
       enrolledUserIds: cls.enrollments.map((e) => e.user.id),
+      groupId: cls.groupId || "",
       repeatWeeks: 1,
       createZoom: false,
     });
@@ -455,16 +545,34 @@ export default function ClassesAdminPage() {
                   <Input type="number" value={form.duration} onChange={(e) => setForm({ ...form, duration: Number(e.target.value) })} />
                 </div>
               </div>
-              <div className="space-y-2">
-                <Label>Ürün (opsiyonel)</Label>
-                <Select value={form.productId} onValueChange={(v) => setForm({ ...form, productId: v })}>
-                  <SelectTrigger><SelectValue placeholder="Ürün seçin" /></SelectTrigger>
-                  <SelectContent>
-                    {(products || []).map((p) => (
-                      <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Ürün (opsiyonel)</Label>
+                  <Select value={form.productId} onValueChange={(v) => setForm({ ...form, productId: v })}>
+                    <SelectTrigger><SelectValue placeholder="Ürün seçin" /></SelectTrigger>
+                    <SelectContent>
+                      {(products || []).map((p) => (
+                        <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Grup (opsiyonel)</Label>
+                  <Select value={form.groupId} onValueChange={(v) => {
+                    const group = (groups || []).find((g) => g.id === v);
+                    const groupUserIds = group ? group.members.map((m) => m.user.id) : [];
+                    const merged = [...new Set([...form.enrolledUserIds, ...groupUserIds])];
+                    setForm({ ...form, groupId: v, enrolledUserIds: merged });
+                  }}>
+                    <SelectTrigger><SelectValue placeholder="Grup seçin" /></SelectTrigger>
+                    <SelectContent>
+                      {(groups || []).map((g) => (
+                        <SelectItem key={g.id} value={g.id}>{g.name} ({g._count.members})</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
               {form.type === "LIVE" && (
                 <>

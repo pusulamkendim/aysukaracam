@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { createZoomMeeting } from "@/lib/zoom";
+import { sendEnrollmentNotification } from "@/lib/mail";
 import { NextResponse } from "next/server";
 
 export async function GET() {
@@ -13,9 +14,19 @@ export async function GET() {
     orderBy: { scheduledAt: "asc" },
     include: {
       product: { select: { name: true } },
+      group: {
+        select: {
+          id: true,
+          name: true,
+          members: {
+            include: { user: { select: { id: true, name: true, email: true, phone: true } } },
+          },
+        },
+      },
       enrollments: {
-        include: {
+        select: {
           user: { select: { id: true, name: true, email: true, phone: true } },
+          source: true,
         },
       },
       _count: { select: { enrollments: true } },
@@ -83,6 +94,7 @@ export async function POST(request: Request) {
         description: body.description,
         type: body.type || "LIVE",
         productId: body.productId || null,
+        groupId: body.groupId || null,
         scheduledAt: classDate,
         duration: body.duration,
         recordingUrl: body.recordingUrl,
@@ -93,7 +105,10 @@ export async function POST(request: Request) {
       },
     });
 
-    // Enrollment oluştur
+    // Tüm kayıt yapılacak kullanıcı ID'lerini topla
+    const allEnrolledUserIds = new Set<string>(body.enrolledUserIds || []);
+
+    // Bireysel enrollment oluştur
     if (body.enrolledUserIds && body.enrolledUserIds.length > 0) {
       await prisma.enrollment.createMany({
         data: body.enrolledUserIds.map((userId: string) => ({
@@ -102,6 +117,43 @@ export async function POST(request: Request) {
         })),
         skipDuplicates: true,
       });
+    }
+
+    // Grup üyelerini enrollment olarak ekle
+    if (body.groupId) {
+      const groupMembers = await prisma.groupMember.findMany({
+        where: { groupId: body.groupId },
+        select: { userId: true },
+      });
+      for (const m of groupMembers) allEnrolledUserIds.add(m.userId);
+      if (groupMembers.length > 0) {
+        await prisma.enrollment.createMany({
+          data: groupMembers.map((m: { userId: string }) => ({
+            userId: m.userId,
+            classId: cls.id,
+            source: "group",
+          })),
+          skipDuplicates: true,
+        });
+      }
+    }
+
+    // Kayıt yapılan kullanıcılara mail gönder (sadece ilk ders için, tekrarlılarda spam olmasın)
+    if (i === 0 && allEnrolledUserIds.size > 0) {
+      const enrolledUsers = await prisma.user.findMany({
+        where: { id: { in: [...allEnrolledUserIds] } },
+        select: { email: true, name: true },
+      });
+      for (const u of enrolledUsers) {
+        sendEnrollmentNotification(
+          u.email,
+          u.name || "",
+          cls.title,
+          cls.scheduledAt?.toISOString() || null,
+          cls.duration,
+          zoomJoinUrl,
+        ).catch(() => {});
+      }
     }
 
     createdClasses.push(cls);

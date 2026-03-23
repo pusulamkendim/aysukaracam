@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Package, GraduationCap, Users, CreditCard, ArrowLeft, Menu, X } from "lucide-react";
+import { LayoutDashboard, Package, GraduationCap, Users, UsersRound, CreditCard, ArrowLeft, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import AuthGuard from "@/components/AuthGuard";
 import { useState } from "react";
@@ -11,6 +11,7 @@ const adminLinks = [
   { name: "Dashboard", path: "/admin", icon: LayoutDashboard },
   { name: "Ürünler", path: "/admin/urunler", icon: Package },
   { name: "Dersler", path: "/admin/dersler", icon: GraduationCap },
+  { name: "Gruplar", path: "/admin/gruplar", icon: UsersRound },
   { name: "Üyeler", path: "/admin/uyeler", icon: Users },
   { name: "Siparişler", path: "/admin/siparisler", icon: CreditCard },
 ];

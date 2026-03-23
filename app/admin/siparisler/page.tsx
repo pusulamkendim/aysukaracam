@@ -9,8 +9,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { formatPrice } from "@/lib/utils";
+import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 interface OrderItem {
@@ -45,6 +47,19 @@ export default function OrdersPage() {
     queryFn: () => fetch("/api/admin/orders").then((r) => r.json()),
   });
 
+  const deleteOrder = useMutation({
+    mutationFn: (id: string) =>
+      fetch(`/api/admin/orders/${id}`, { method: "DELETE" }).then((r) => {
+        if (!r.ok) return r.json().then((d) => { throw new Error(d.error); });
+        return r.json();
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
+      toast.success("Sipariş silindi");
+    },
+    onError: (err: Error) => toast.error(err.message),
+  });
+
   const updateStatus = useMutation({
     mutationFn: ({ id, status }: { id: string; status: string }) =>
       fetch(`/api/admin/orders/${id}`, {
@@ -76,6 +91,7 @@ export default function OrdersPage() {
                   <th className="p-4">Tarih</th>
                   <th className="p-4">Shopier</th>
                   <th className="p-4">Durum</th>
+                  <th className="p-4">İşlem</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -121,6 +137,22 @@ export default function OrdersPage() {
                           ))}
                         </SelectContent>
                       </Select>
+                    </td>
+                    <td className="p-4">
+                      {order.status !== "PAID" && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="text-destructive"
+                          onClick={() => {
+                            if (confirm("Bu siparişi silmek istediğinize emin misiniz?")) {
+                              deleteOrder.mutate(order.id);
+                            }
+                          }}
+                        >
+                          <Trash2 size={16} />
+                        </Button>
+                      )}
                     </td>
                   </tr>
                 ))}

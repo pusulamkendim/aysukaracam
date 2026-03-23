@@ -60,6 +60,9 @@ export default function MembersPage() {
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [editPhone, setEditPhone] = useState("");
   const [editingPhone, setEditingPhone] = useState(false);
+  const [showAllUpcoming, setShowAllUpcoming] = useState(false);
+  const [showAllPast, setShowAllPast] = useState(false);
+  const [showAllOrders, setShowAllOrders] = useState(false);
 
   const { data: users, isLoading } = useQuery<UserItem[]>({
     queryKey: ["admin-users"],
@@ -114,12 +117,12 @@ export default function MembersPage() {
   });
 
   const now = new Date();
-  const upcomingEnrollments = (userDetail?.enrollments || []).filter(
-    (e) => e.class.scheduledAt && new Date(e.class.scheduledAt) > now
-  );
-  const pastEnrollments = (userDetail?.enrollments || []).filter(
-    (e) => !e.class.scheduledAt || new Date(e.class.scheduledAt) <= now
-  );
+  const upcomingEnrollments = (userDetail?.enrollments || [])
+    .filter((e) => e.class.scheduledAt && new Date(e.class.scheduledAt) > now)
+    .sort((a, b) => new Date(a.class.scheduledAt!).getTime() - new Date(b.class.scheduledAt!).getTime());
+  const pastEnrollments = (userDetail?.enrollments || [])
+    .filter((e) => !e.class.scheduledAt || new Date(e.class.scheduledAt) <= now)
+    .sort((a, b) => new Date(b.class.scheduledAt || 0).getTime() - new Date(a.class.scheduledAt || 0).getTime());
 
   return (
     <div>
@@ -203,7 +206,7 @@ export default function MembersPage() {
       )}
 
       {/* Kullanıcı Detay Dialog */}
-      <Dialog open={!!selectedUserId} onOpenChange={(open) => !open && setSelectedUserId(null)}>
+      <Dialog open={!!selectedUserId} onOpenChange={(open) => { if (!open) { setSelectedUserId(null); setShowAllUpcoming(false); setShowAllPast(false); setShowAllOrders(false); } }}>
         <DialogContent className="max-w-2xl">
           <DialogHeader className="sr-only">
             <DialogTitle>Üye Detayı</DialogTitle>
@@ -265,7 +268,7 @@ export default function MembersPage() {
                   <p className="text-sm text-muted-foreground text-center py-3">Yaklaşan ders yok</p>
                 ) : (
                   <div className="space-y-2">
-                    {upcomingEnrollments.map((e) => (
+                    {(showAllUpcoming ? upcomingEnrollments : upcomingEnrollments.slice(0, 3)).map((e) => (
                       <div key={e.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
                         <div>
                           <p className="text-sm font-medium">{e.class.title}</p>
@@ -285,6 +288,11 @@ export default function MembersPage() {
                         </Badge>
                       </div>
                     ))}
+                    {upcomingEnrollments.length > 3 && !showAllUpcoming && (
+                      <button onClick={() => setShowAllUpcoming(true)} className="text-xs text-primary hover:underline w-full text-center pt-1">
+                        +{upcomingEnrollments.length - 3} ders daha göster
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
@@ -299,7 +307,7 @@ export default function MembersPage() {
                   <p className="text-sm text-muted-foreground text-center py-3">Geçmiş ders yok</p>
                 ) : (
                   <div className="space-y-2 opacity-70">
-                    {pastEnrollments.map((e) => (
+                    {(showAllPast ? pastEnrollments : pastEnrollments.slice(0, 3)).map((e) => (
                       <div key={e.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
                         <div>
                           <p className="text-sm font-medium">{e.class.title}</p>
@@ -319,6 +327,11 @@ export default function MembersPage() {
                         </Badge>
                       </div>
                     ))}
+                    {pastEnrollments.length > 3 && !showAllPast && (
+                      <button onClick={() => setShowAllPast(true)} className="text-xs text-primary hover:underline w-full text-center pt-1">
+                        +{pastEnrollments.length - 3} ders daha göster
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
@@ -333,7 +346,7 @@ export default function MembersPage() {
                   <p className="text-sm text-muted-foreground text-center py-3">Sipariş yok</p>
                 ) : (
                   <div className="space-y-2">
-                    {userDetail.orders.map((order) => (
+                    {(showAllOrders ? userDetail.orders : userDetail.orders.slice(0, 3)).map((order) => (
                       <div key={order.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
                         <div>
                           <p className="text-sm font-medium">
@@ -348,6 +361,11 @@ export default function MembersPage() {
                         </Badge>
                       </div>
                     ))}
+                    {userDetail.orders.length > 3 && !showAllOrders && (
+                      <button onClick={() => setShowAllOrders(true)} className="text-xs text-primary hover:underline w-full text-center pt-1">
+                        +{userDetail.orders.length - 3} sipariş daha göster
+                      </button>
+                    )}
                   </div>
                 )}
               </div>

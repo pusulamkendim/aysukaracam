@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { sendEnrollmentNotification } from "@/lib/mail";
 import { NextResponse } from "next/server";
 
 export async function PATCH(
@@ -24,6 +25,7 @@ export async function PATCH(
   if (body.duration !== undefined) classData.duration = body.duration;
   if (body.recordingUrl !== undefined) classData.recordingUrl = body.recordingUrl;
   if (body.isActive !== undefined) classData.isActive = body.isActive;
+  if (body.groupId !== undefined) classData.groupId = body.groupId || null;
 
   try {
     const cls = await prisma.class.update({
@@ -37,7 +39,6 @@ export async function PATCH(
       const relatedClassIds = [id];
 
       if (cls.zoomMeetingId && body.applyToSeries !== false) {
-        // Aynı Zoom linkine sahip gelecek dersleri bul
         const relatedClasses = await prisma.class.findMany({
           where: {
             zoomMeetingId: cls.zoomMeetingId,
@@ -50,12 +51,25 @@ export async function PATCH(
         relatedClassIds.push(...relatedClasses.map((c) => c.id));
       }
 
-      // Tüm ilgili derslerin enrollment'larını güncelle
+      // Mevcut enrollment'ları al (yeni eklenen kişilere mail göndermek için)
+      const existingEnrollments = await prisma.enrollment.findMany({
+        where: { classId: id },
+        select: { userId: true },
+      });
+      const existingUserIds = new Set(existingEnrollments.map((e) => e.userId));
+
       for (const classId of relatedClassIds) {
+        // Sadece bireysel enrollment'ları sil, grup source olanları koru
         await prisma.enrollment.deleteMany({
-          where: { classId },
+          where: { classId, source: { not: "group" } },
         });
 
+        // source=group olanları da sil (grup değiştiyse yeniden oluşacak)
+        await prisma.enrollment.deleteMany({
+          where: { classId, source: "group" },
+        });
+
+        // Bireysel enrollment'ları oluştur
         if (body.enrolledUserIds.length > 0) {
           await prisma.enrollment.createMany({
             data: body.enrolledUserIds.map((userId: string) => ({
@@ -64,6 +78,61 @@ export async function PATCH(
             })),
             skipDuplicates: true,
           });
+        }
+
+        // Grup enrollment'ları oluştur
+        const groupId = body.groupId !== undefined ? (body.groupId || null) : cls.groupId;
+        if (groupId) {
+          const groupMembers = await prisma.groupMember.findMany({
+            where: { groupId },
+            select: { userId: true },
+          });
+          if (groupMembers.length > 0) {
+            await prisma.enrollment.createMany({
+              data: groupMembers.map((m) => ({
+                userId: m.userId,
+                classId,
+                source: "group" as const,
+              })),
+              skipDuplicates: true,
+            });
+          }
+        }
+
+        // Seri derslerine de groupId uygula
+        if (classId !== id) {
+          await prisma.class.update({
+            where: { id: classId },
+            data: { groupId: body.groupId !== undefined ? (body.groupId || null) : undefined },
+          });
+        }
+      }
+
+      // Yeni eklenen kullanıcılara mail gönder
+      const allNewUserIds = new Set<string>(body.enrolledUserIds || []);
+      const groupId = body.groupId !== undefined ? (body.groupId || null) : cls.groupId;
+      if (groupId) {
+        const gm = await prisma.groupMember.findMany({
+          where: { groupId },
+          select: { userId: true },
+        });
+        for (const m of gm) allNewUserIds.add(m.userId);
+      }
+      const addedUserIds = [...allNewUserIds].filter((uid) => !existingUserIds.has(uid));
+      if (addedUserIds.length > 0) {
+        const addedUsers = await prisma.user.findMany({
+          where: { id: { in: addedUserIds } },
+          select: { email: true, name: true },
+        });
+        for (const u of addedUsers) {
+          sendEnrollmentNotification(
+            u.email,
+            u.name || "",
+            cls.title,
+            cls.scheduledAt?.toISOString() || null,
+            cls.duration,
+            cls.zoomJoinUrl,
+          ).catch(() => {});
         }
       }
     }

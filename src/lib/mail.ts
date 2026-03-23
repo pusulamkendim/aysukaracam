@@ -100,3 +100,46 @@ export async function sendWelcomeEmail(to: string, name: string) {
     console.error("Mail gönderme hatası (hoş geldin):", error);
   }
 }
+
+export async function sendEnrollmentNotification(
+  to: string,
+  name: string,
+  classTitle: string,
+  scheduledAt: string | null,
+  duration: number | null,
+  zoomJoinUrl: string | null,
+) {
+  const dateStr = scheduledAt
+    ? new Date(scheduledAt).toLocaleDateString("tr-TR", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : null;
+
+  try {
+    await resend.emails.send({
+      from: FROM_EMAIL,
+      to,
+      subject: `Derse Kaydınız: ${classTitle}`,
+      html: `
+        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #2d5a3d;">Derse Kaydınız Tamamlandı</h2>
+          <p>Merhaba ${name || ""},</p>
+          <p><strong>${classTitle}</strong> dersine kaydınız yapılmıştır.</p>
+          ${dateStr ? `<p>📅 <strong>Tarih:</strong> ${dateStr}</p>` : ""}
+          ${duration ? `<p>⏱ <strong>Süre:</strong> ${duration} dakika</p>` : ""}
+          ${zoomJoinUrl ? `<p>🔗 <strong>Zoom Linki:</strong> <a href="${zoomJoinUrl}">${zoomJoinUrl}</a></p>` : ""}
+          <p>Derslerinize <a href="https://aysu.pusulamkendim.com/dashboard">dashboard</a> üzerinden erişebilirsiniz.</p>
+          <br/>
+          <p>Namaste 🧘</p>
+          <p><em>Aysu Itır Karaçam</em></p>
+        </div>
+      `,
+    });
+  } catch (error) {
+    console.error("Mail gönderme hatası (enrollment):", error);
+  }
+}

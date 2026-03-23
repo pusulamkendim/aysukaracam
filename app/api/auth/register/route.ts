@@ -46,7 +46,7 @@ export async function POST(request: Request) {
     });
 
     // Hoş geldin maili
-    sendWelcomeEmail(email, name).catch(() => {});
+    sendWelcomeEmail(email, name).catch((err) => console.error("Welcome mail hatası:", err));
 
     return NextResponse.json(
       { message: "Kayıt başarılı", userId: user.id },

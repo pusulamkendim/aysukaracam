@@ -64,3 +64,29 @@ export async function PATCH(
 
   return NextResponse.json(order);
 }
+
+export async function DELETE(
+  _request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const session = await auth();
+  if (session?.user?.role !== "ADMIN") {
+    return NextResponse.json({ error: "Yetkisiz" }, { status: 403 });
+  }
+
+  const { id } = await params;
+
+  const order = await prisma.order.findUnique({ where: { id } });
+  if (!order) {
+    return NextResponse.json({ error: "Sipariş bulunamadı" }, { status: 404 });
+  }
+
+  if (order.status === "PAID") {
+    return NextResponse.json({ error: "Ödenmiş sipariş silinemez" }, { status: 400 });
+  }
+
+  await prisma.orderItem.deleteMany({ where: { orderId: id } });
+  await prisma.order.delete({ where: { id } });
+
+  return NextResponse.json({ message: "Sipariş silindi" });
+}
