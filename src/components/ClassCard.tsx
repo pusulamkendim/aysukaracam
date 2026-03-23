@@ -77,9 +77,11 @@ const ClassCard = ({ title, description, duration, difficulty, image, students, 
           className="object-cover group-hover:scale-105 transition-transform duration-300"
         />
       )}
-      <Badge className={`absolute top-4 right-4 z-10 text-xl px-3 py-1 ${difficultyColors[difficulty]}`}>
-        {difficulty}
-      </Badge>
+      {difficulty && (
+        <Badge className={`absolute top-4 right-4 z-10 text-xl px-3 py-1 ${difficultyColors[difficulty]}`}>
+          {difficulty}
+        </Badge>
+      )}
       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-white/20" />
       <div className="absolute inset-x-0 bottom-0 z-10 p-5 space-y-3">
         <div>

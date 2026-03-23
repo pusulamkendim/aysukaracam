@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ImagePlus, X, Loader2 } from "lucide-react";
-import Image from "next/image";
+/* eslint-disable @next/next/no-img-element */
 import { toast } from "sonner";
 
 interface ImageUploadProps {
@@ -58,11 +58,10 @@ export default function ImageUpload({ value, onChange, label }: ImageUploadProps
 
       {value ? (
         <div className="relative w-full h-40 rounded-lg overflow-hidden border border-border">
-          <Image
+          <img
             src={value}
             alt="Yüklenen görsel"
-            fill
-            className="object-cover"
+            className="w-full h-full object-cover"
           />
           <button
             type="button"
@@ -97,7 +96,7 @@ export default function ImageUpload({ value, onChange, label }: ImageUploadProps
       <input
         ref={inputRef}
         type="file"
-        accept="image/jpeg,image/png,image/webp,image/gif"
+        accept="image/jpeg,image/png,image/webp,image/gif,image/heic,image/heif"
         onChange={handleFileSelect}
         className="hidden"
       />

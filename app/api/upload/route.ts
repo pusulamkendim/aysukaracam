@@ -17,7 +17,7 @@ export async function POST(request: Request) {
   }
 
   // Dosya tipi kontrolü
-  const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+  const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/heic", "image/heif"];
   if (!allowedTypes.includes(file.type)) {
     return NextResponse.json(
       { error: "Sadece JPEG, PNG, WebP ve GIF dosyaları kabul edilir" },

@@ -75,35 +75,6 @@ export default function HomePage() {
       <Navbar />
       <Hero />
 
-      {/* Hakkımda */}
-      <section className="py-20 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <AboutSlider />
-            <div className="space-y-6 animate-slide-up">
-              <h2 className="text-4xl font-bold">Hakkımda</h2>
-              <p className="text-lg text-foreground/80">
-                On yılı aşkın özveriyle sürdürdüğüm pratik ve eğitimle, binlerce öğrenciye
-                yoga yolculuklarında rehberlik etme ayrıcalığına sahip oldum. Yaklaşımım,
-                dönüştürücü bir deneyim yaratmak için geleneksel bilgeliği modern sağlık
-                bilimiyle harmanlamak üzerine.
-              </p>
-              <p className="text-lg text-foreground/80">
-                Yoganın sadece fiziksel pozlardan ibaret olmadığına inanıyorum — yoga zihni, bedeni
-                ve ruhu besleyen bütünsel bir pratiktir. İster tamamen yeni başlayan olun ister
-                deneyimli bir uygulayıcı, derslerim sizi olduğunuz yerde karşılamak için
-                tasarlanmıştır.
-              </p>
-              <div className="pt-2">
-                <Link href="/about">
-                  <Button variant="outline">Daha Fazla Bilgi</Button>
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Öne Çıkan Dersler */}
       <section className="py-20 bg-background">
         <div className="container mx-auto px-4">
@@ -134,6 +105,35 @@ export default function HomePage() {
                 Tüm Dersleri Gör
               </Button>
             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Hakkımda */}
+      <section className="py-20 bg-muted/30">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <AboutSlider />
+            <div className="space-y-6 animate-slide-up">
+              <h2 className="text-4xl font-bold">Hakkımda</h2>
+              <p className="text-lg text-foreground/80">
+                On yılı aşkın özveriyle sürdürdüğüm pratik ve eğitimle, binlerce öğrenciye
+                yoga yolculuklarında rehberlik etme ayrıcalığına sahip oldum. Yaklaşımım,
+                dönüştürücü bir deneyim yaratmak için geleneksel bilgeliği modern sağlık
+                bilimiyle harmanlamak üzerine.
+              </p>
+              <p className="text-lg text-foreground/80">
+                Yoganın sadece fiziksel pozlardan ibaret olmadığına inanıyorum — yoga zihni, bedeni
+                ve ruhu besleyen bütünsel bir pratiktir. İster tamamen yeni başlayan olun ister
+                deneyimli bir uygulayıcı, derslerim sizi olduğunuz yerde karşılamak için
+                tasarlanmıştır.
+              </p>
+              <div className="pt-2">
+                <Link href="/about">
+                  <Button variant="outline">Daha Fazla Bilgi</Button>
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </section>

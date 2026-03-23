@@ -4,10 +4,12 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Volume2, VolumeX } from "lucide-react";
 import { useRef, useState } from "react";
+import { useSession } from "next-auth/react";
 
 const Hero = () => {
   const audioRef = useRef<HTMLVideoElement>(null);
   const [isMuted, setIsMuted] = useState(true);
+  const { data: session } = useSession();
 
   const toggleAudio = () => {
     const audio = audioRef.current;
@@ -34,7 +36,7 @@ const Hero = () => {
           playsInline
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-black/40"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/15 to-black/50"></div>
       </div>
 
       {/* Background Audio */}
@@ -57,19 +59,15 @@ const Hero = () => {
       </button>
 
       {/* Content */}
-      <div className="container mx-auto px-4 z-10 text-white">
-        <div className="max-w-2xl animate-fade-in border-l-4 border-white/60 pl-8">
-          <h1 className="font-heading text-5xl md:text-7xl font-bold mb-6 leading-tight">
-            Namaste
-          </h1>
-          <p className="text-lg md:text-xl mb-8 text-white/90 font-light">
-            &ldquo;
-            Her an, kaynağında buluşacağız.&rdquo;
+      <div className="container mx-auto px-4 z-10 text-white text-center">
+        <div className="max-w-3xl mx-auto animate-fade-in">
+          <p className="text-2xl md:text-4xl mb-12 text-white/90 font-light italic tracking-wide" style={{ fontFamily: "'Georgia', 'Times New Roman', serif" }}>
+            &ldquo;Her an, kaynağında buluşacağız.&rdquo;
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 mt-64">
-            <Link href="/pricing">
-              <Button size="lg" variant="secondary" className="w-full sm:w-auto opacity-80">
-                Yolculuğuna Başla
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mt-48">
+            <Link href={session ? "/dashboard" : "/auth/giris"}>
+              <Button size="lg" variant="secondary" className="w-full sm:w-auto opacity-90">
+                Platforma Giriş
               </Button>
             </Link>
             <Link href="/classes">

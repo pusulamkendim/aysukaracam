@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import crypto from "crypto";
+import { sendPaymentConfirmation, sendPaymentNotificationToAdmin } from "@/lib/mail";
 
 /**
  * Shopier Webhook Handler
@@ -175,6 +176,12 @@ async function handleOrderCreated(order: {
 
     // Sepeti temizle
     await prisma.cartItem.deleteMany({ where: { userId: user.id } });
+
+    // Mail bildirimleri
+    const itemNames = orderWithItems.items.map((i) => i.product.name);
+    const totalFormatted = `${(orderWithItems.totalAmount / 100).toLocaleString("tr-TR")} ₺`;
+    await sendPaymentConfirmation(buyerEmail, user.name || "", itemNames, totalFormatted);
+    await sendPaymentNotificationToAdmin(user.name || "", buyerEmail, itemNames, totalFormatted);
   }
 
   console.log(`Sipariş onaylandı: ${dbOrder.id} (Shopier: ${shopierOrderId})`);

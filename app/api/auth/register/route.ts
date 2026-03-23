@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { NextResponse } from "next/server";
+import { sendWelcomeEmail } from "@/lib/mail";
 
 const registerSchema = z.object({
   name: z.string().min(2, "İsim en az 2 karakter olmalıdır"),
@@ -43,6 +44,9 @@ export async function POST(request: Request) {
         passwordHash,
       },
     });
+
+    // Hoş geldin maili
+    sendWelcomeEmail(email, name).catch(() => {});
 
     return NextResponse.json(
       { message: "Kayıt başarılı", userId: user.id },

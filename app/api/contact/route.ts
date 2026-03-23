@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { sendContactForm } from "@/lib/mail";
 
 const contactSchema = z.object({
   name: z.string().min(2),
@@ -20,9 +21,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // TODO: E-posta gönderimi (Resend, Nodemailer vb.) eklenebilir
-    // Şimdilik logluyoruz
-    console.log("Yeni iletişim mesajı:", parsed.data);
+    await sendContactForm(parsed.data.name, parsed.data.email, parsed.data.message);
 
     return NextResponse.json(
       { message: "Mesajınız alındı, en kısa sürede dönüş yapacağız." },

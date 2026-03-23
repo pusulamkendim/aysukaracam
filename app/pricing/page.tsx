@@ -132,17 +132,18 @@ export default function PricingPage() {
             ))}
           </div>
 
-          {/* Para iade garantisi */}
+          {/* Para iade garantisi - geçici olarak gizlendi
           <div className="text-center mt-12 animate-fade-in">
             <div className="inline-flex items-center gap-2 px-6 py-3 bg-secondary/20 rounded-full">
               <Check className="text-secondary" size={20} />
               <span className="text-sm font-medium">30 gün para iade garantisi</span>
             </div>
           </div>
+          */}
         </div>
       </section>
 
-      {/* Karşılaştırma Tablosu */}
+      {/* Karşılaştırma Tablosu - geçici olarak gizlendi
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
@@ -196,6 +197,7 @@ export default function PricingPage() {
           </div>
         </div>
       </section>
+      */}
 
       {/* SSS */}
       <section className="py-20">

@@ -24,10 +24,7 @@ export async function POST() {
 
   // Mevcut PENDING sipariş varsa yeni oluşturma
   let order = await prisma.order.findFirst({
-    where: {
-      userId: session.user.id,
-      status: "PENDING",
-    },
+    where: { userId: session.user.id, status: "PENDING" },
     orderBy: { createdAt: "desc" },
   });
 
@@ -48,12 +45,12 @@ export async function POST() {
     });
   }
 
-  // Sepet temizlenMEZ - ödeme onaylanınca (webhook) temizlenecek
-
-  // Her ürün için Shopier linklerini oluştur
+  // Shopier ürün linklerini oluştur
   const shopUsername = process.env.SHOPIER_SHOP_USERNAME || "necipyoga";
   const checkoutItems = cartItems.map((item) => ({
     name: item.product.name,
+    description: item.product.description,
+    duration: item.product.duration,
     quantity: item.quantity,
     price: item.product.price,
     shopierUrl: item.product.gumroadId

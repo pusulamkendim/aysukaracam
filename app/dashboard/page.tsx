@@ -6,10 +6,12 @@ import AuthGuard from "@/components/AuthGuard";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, Video, BookOpen, ShoppingBag } from "lucide-react";
+import { Calendar, Clock, Video, BookOpen, ShoppingBag, MessageCircle, X } from "lucide-react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useQuery } from "@tanstack/react-query";
+import { useSearchParams } from "next/navigation";
+import { useState, Suspense } from "react";
 
 interface UserProfile {
   id: string;
@@ -39,8 +41,14 @@ interface Enrollment {
 }
 
 
-export default function DashboardPage() {
+const AYSU_PHONE = process.env.NEXT_PUBLIC_AYSU_PHONE || "905xxxxxxxxx";
+
+function DashboardContent() {
   const { data: session } = useSession();
+  const searchParams = useSearchParams();
+  const [showPaymentBanner, setShowPaymentBanner] = useState(
+    () => searchParams.get("payment") === "success"
+  );
 
   const { data: profile } = useQuery<UserProfile>({
     queryKey: ["user-profile"],
@@ -82,6 +90,33 @@ export default function DashboardPage() {
 
       <div className="pt-24 pb-20">
         <div className="container mx-auto px-4">
+          {/* Ödeme Başarılı Banner */}
+          {showPaymentBanner && (
+            <div className="mb-6 p-4 rounded-xl bg-primary/10 border border-primary/20 animate-fade-in">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1">
+                  <h3 className="font-semibold text-primary mb-1">Ödemeniz başarıyla tamamlandı!</h3>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Dersleriniz aktif oldu. Sorularınız için Aysu ile iletişime geçebilirsiniz.
+                  </p>
+                  <a
+                    href={`https://wa.me/${AYSU_PHONE}?text=${encodeURIComponent("Merhaba Aysu! Ödeme yaptım ve derslerime başlamak istiyorum 🧘")}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Button size="sm" variant="default" className="gap-2">
+                      <MessageCircle size={16} />
+                      WhatsApp ile İletişime Geç
+                    </Button>
+                  </a>
+                </div>
+                <button onClick={() => setShowPaymentBanner(false)} className="text-muted-foreground hover:text-foreground">
+                  <X size={18} />
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Başlık */}
           <div className="mb-8 animate-fade-in">
             <h1 className="text-4xl font-bold mb-2">
@@ -260,5 +295,13 @@ export default function DashboardPage() {
       <Footer />
     </div>
     </AuthGuard>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense>
+      <DashboardContent />
+    </Suspense>
   );
 }

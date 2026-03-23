@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/select";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { formatPrice } from "@/lib/utils";
-import { Plus, Pencil, Power, PowerOff } from "lucide-react";
+import { Plus, Pencil, Power, PowerOff, Trash2 } from "lucide-react";
 import ImageUpload from "@/components/ImageUpload";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -57,12 +57,14 @@ function ProductTable({
   products,
   onEdit,
   onToggleActive,
+  onDelete,
   togglePending,
   isPast,
 }: {
   products: Product[];
   onEdit: (p: Product) => void;
   onToggleActive: (id: string, isActive: boolean) => void;
+  onDelete?: (id: string) => void;
   togglePending: boolean;
   isPast?: boolean;
 }) {
@@ -133,6 +135,21 @@ function ProductTable({
                     >
                       {product.isActive ? <PowerOff size={16} /> : <Power size={16} />}
                     </Button>
+                    {isPast && onDelete && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-destructive"
+                        title="Kalıcı olarak sil"
+                        onClick={() => {
+                          if (confirm("Bu ürünü kalıcı olarak silmek istediğinize emin misiniz?")) {
+                            onDelete(product.id);
+                          }
+                        }}
+                      >
+                        <Trash2 size={16} />
+                      </Button>
+                    )}
                   </div>
                 </td>
               </tr>
@@ -177,6 +194,19 @@ export default function ProductsPage() {
       toast.success(editingId ? "Ürün güncellendi" : "Ürün eklendi");
     },
     onError: () => toast.error("Bir hata oluştu"),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) =>
+      fetch(`/api/admin/products/${id}?permanent=true`, { method: "DELETE" }).then((r) => {
+        if (!r.ok) return r.json().then((d) => { throw new Error(d.error); });
+        return r.json();
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+      toast.success("Ürün kalıcı olarak silindi");
+    },
+    onError: (err: Error) => toast.error(err.message || "Silme başarısız"),
   });
 
   const toggleActiveMutation = useMutation({
@@ -250,7 +280,7 @@ export default function ProductsPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Fiyat (₺)</Label>
-                  <Input type="number" value={form.price} onChange={(e) => setForm({ ...form, price: Number(e.target.value) })} required />
+                  <Input type="number" value={form.price || ""} onChange={(e) => setForm({ ...form, price: Number(e.target.value) })} required />
                 </div>
                 <div className="space-y-2">
                   <Label>Tip</Label>
@@ -314,6 +344,7 @@ export default function ProductsPage() {
                 products={inactiveProducts}
                 onEdit={openEdit}
                 onToggleActive={(id, isActive) => toggleActiveMutation.mutate({ id, isActive })}
+                onDelete={(id) => deleteMutation.mutate(id)}
                 togglePending={toggleActiveMutation.isPending}
                 isPast
               />

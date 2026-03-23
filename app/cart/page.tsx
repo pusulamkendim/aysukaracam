@@ -9,35 +9,50 @@ import { formatPrice } from "@/lib/utils";
 import { Trash2, Minus, Plus, ShoppingCart, CreditCard, ExternalLink, Info } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
+import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
 interface CheckoutItem {
   name: string;
+  description: string | null;
+  duration: string | null;
   quantity: number;
   price: number;
   shopierUrl: string | null;
 }
 
-export default function CartPage() {
+function CartContent() {
   const { items, total, isLoading, removeItem, updateQuantity, checkout } =
     useCart();
-
+  const searchParams = useSearchParams();
   const [checkoutItems, setCheckoutItems] = useState<CheckoutItem[] | null>(null);
 
-  const handleCheckout = async () => {
-    try {
-      const result = await checkout.mutateAsync();
-      if (result.checkoutItems) {
-        setCheckoutItems(result.checkoutItems);
-      }
-    } catch {
-      toast.error("Checkout sırasında bir hata oluştu");
+  useEffect(() => {
+    const payment = searchParams.get("payment");
+    if (payment === "success") {
+      toast.success("Ödeme başarıyla tamamlandı!");
+    } else if (payment === "failed") {
+      toast.error("Ödeme başarısız oldu. Lütfen tekrar deneyin.");
     }
-  };
+  }, [searchParams]);
+
+  // Sepet değiştiğinde otomatik checkout yap
+  useEffect(() => {
+    if (!isLoading && items.length > 0) {
+      checkout.mutateAsync().then((result) => {
+        if (result.checkoutItems) {
+          setCheckoutItems(result.checkoutItems);
+        }
+      }).catch(() => {});
+    } else if (items.length === 0) {
+      setCheckoutItems(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoading, items.length]);
 
   return (
-    <AuthGuard>
     <div className="min-h-screen">
       <Navbar />
 
@@ -49,7 +64,7 @@ export default function CartPage() {
             <div className="text-center py-12 text-muted-foreground">
               Yükleniyor...
             </div>
-          ) : items.length === 0 && !checkoutItems ? (
+          ) : items.length === 0 ? (
             <div className="text-center py-20 animate-fade-in">
               <ShoppingCart
                 size={64}
@@ -156,98 +171,58 @@ export default function CartPage() {
               {/* Sipariş Özeti */}
               <div className="lg:col-span-1">
                 <div className="bg-card rounded-xl p-6 shadow-[var(--shadow-soft)] sticky top-24">
+                  <div className="flex items-center gap-2 mb-4">
+                    <CreditCard size={20} className="text-primary" />
+                    <h2 className="text-xl font-semibold">Ödemeyi Tamamlayın</h2>
+                  </div>
+
+                  <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50 border border-border mb-4">
+                    <Info size={16} className="text-primary mt-0.5 shrink-0" />
+                    <p className="text-xs text-muted-foreground">
+                      Ödeme işlemi güvenli altyapı <strong>Shopier</strong> üzerinden gerçekleştirilmektedir.
+                    </p>
+                  </div>
+
                   {checkoutItems ? (
-                    <>
-                      <div className="flex items-center gap-2 mb-4">
-                        <CreditCard size={20} className="text-primary" />
-                        <h2 className="text-xl font-semibold">
-                          Ödemeyi Tamamlayın.
-                        </h2>
-                      </div>
-
-                      <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50 border border-border mb-4">
-                        <Info size={16} className="text-primary mt-0.5 shrink-0" />
-                        <p className="text-xs text-muted-foreground">
-                          Ödeme işlemi güvenli ödeme altyapısı <strong>Shopier</strong> üzerinden gerçekleştirilmektedir.
-                          Kredi kartı ve banka havalesi ile ödeme yapabilirsiniz.
-                        </p>
-                      </div>
-
-                      <div className="space-y-2 mb-4">
-                        {checkoutItems.map((item, index) => (
-                          <div key={index} className="flex items-center justify-between gap-2">
+                    <div className="space-y-3 mb-4">
+                      {checkoutItems.map((item, index) => (
+                        <div key={index} className="p-3 rounded-lg border border-border">
+                          <div className="flex items-center justify-between mb-2">
                             <div className="min-w-0">
-                              <p className="text-sm font-medium truncate">{item.name}</p>
-                              <p className="text-xs text-muted-foreground">
-                                {formatPrice(item.price * item.quantity)}
-                              </p>
+                              <p className="font-medium truncate">{item.name}</p>
+                              <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
+                                {item.duration && <span>{item.duration}</span>}
+                                <span>{formatPrice(item.price)}</span>
+                              </div>
                             </div>
-                            {item.shopierUrl ? (
-                              <a href={item.shopierUrl} target="_blank" rel="noopener noreferrer">
-                                <Button size="sm" variant="default" className="gap-1 shrink-0">
-                                  Öde
-                                  <ExternalLink size={12} />
-                                </Button>
-                              </a>
-                            ) : (
-                              <Button size="sm" disabled variant="outline" className="shrink-0">
-                                Link yok
+                          </div>
+                          {item.shopierUrl ? (
+                            <a href={item.shopierUrl} target="_blank" rel="noopener noreferrer">
+                              <Button className="w-full gap-2" size="sm">
+                                <ExternalLink size={14} />
+                                Shopier ile Öde
                               </Button>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-
-                      <div className="border-t border-border pt-4">
-                        <div className="flex justify-between font-semibold text-lg">
-                          <span>Toplam</span>
-                          <span>{formatPrice(total)}</span>
+                            </a>
+                          ) : (
+                            <Button size="sm" disabled variant="outline" className="w-full">
+                              Ödeme linki bulunamadı
+                            </Button>
+                          )}
                         </div>
-                      </div>
-                    </>
+                      ))}
+                    </div>
                   ) : (
-                    <>
-                      <h2 className="text-xl font-semibold mb-4">
-                        Sipariş Özeti
-                      </h2>
-                      <div className="space-y-2 mb-4">
-                        {items.map((item) => (
-                          <div
-                            key={item.id}
-                            className="flex justify-between text-sm"
-                          >
-                            <span className="truncate mr-2">
-                              {item.product.name} x{item.quantity}
-                            </span>
-                            <span>
-                              {formatPrice(item.product.price * item.quantity)}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                      <div className="border-t border-border pt-4 mb-4">
-                        <div className="flex justify-between font-semibold text-lg">
-                          <span>Toplam</span>
-                          <span>{formatPrice(total)}</span>
-                        </div>
-                      </div>
-
-                      <p className="text-xs text-muted-foreground mb-4">
-                        Ödeme işlemi Shopier güvenli ödeme altyapısı üzerinden gerçekleştirilecektir.
-                      </p>
-
-                      <Button
-                        className="w-full"
-                        size="lg"
-                        onClick={handleCheckout}
-                        disabled={checkout.isPending}
-                      >
-                        {checkout.isPending
-                          ? "İşleniyor..."
-                          : "Sepeti Onayla"}
-                      </Button>
-                    </>
+                    <div className="py-4 text-center text-muted-foreground text-sm">
+                      Ödeme bilgileri yükleniyor...
+                    </div>
                   )}
+
+                  <div className="border-t border-border pt-4">
+                    <div className="flex justify-between font-semibold text-lg">
+                      <span>Toplam</span>
+                      <span>{formatPrice(total)}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -257,6 +232,15 @@ export default function CartPage() {
 
       <Footer />
     </div>
+  );
+}
+
+export default function CartPage() {
+  return (
+    <AuthGuard>
+      <Suspense>
+        <CartContent />
+      </Suspense>
     </AuthGuard>
   );
 }
