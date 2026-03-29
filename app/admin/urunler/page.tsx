@@ -108,7 +108,7 @@ function ProductTable({
                 <td className="p-4">
                   {product.gumroadId ? (
                     <a
-                      href={`https://www.shopier.com/${product.gumroadId}`}
+                      href={`https://www.shopier.com/templeofbodyarts/${product.gumroadId}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-xs text-primary hover:underline"
@@ -315,6 +315,17 @@ export default function ProductsPage() {
                 value={form.image}
                 onChange={(url) => setForm({ ...form, image: url })}
               />
+              <div className="space-y-2">
+                <Label>Shopier Ürün ID</Label>
+                <Input
+                  value={form.gumroadId}
+                  onChange={(e) => setForm({ ...form, gumroadId: e.target.value })}
+                  placeholder="Shopier'dan ürün ID'sini yapıştır"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Shopier'da ürünü oluşturup URL'deki ID'yi buraya yapıştırın (ör: 45666072)
+                </p>
+              </div>
               <Button type="submit" className="w-full" disabled={saveMutation.isPending}>
                 {saveMutation.isPending ? "Kaydediliyor..." : "Kaydet"}
               </Button>

@@ -15,46 +15,46 @@ export async function PATCH(
   const { id } = await params;
   const body = await request.json();
 
-  // Mevcut ürünü al
-  const existing = await prisma.product.findUnique({ where: { id } });
+  // TODO: Shopier API products endpoint 403 veriyor, API düzelince tekrar aktif et
+  // const existing = await prisma.product.findUnique({ where: { id } });
 
-  // Deaktive ediliyorsa Shopier'dan sil
-  if (body.isActive === false && existing?.gumroadId) {
-    try {
-      await deleteShopierProduct(existing.gumroadId);
-      body.gumroadId = null;
-    } catch (error) {
-      console.error("Shopier silme hatası:", error);
-    }
-  }
+  // // Deaktive ediliyorsa Shopier'dan sil
+  // if (body.isActive === false && existing?.gumroadId) {
+  //   try {
+  //     await deleteShopierProduct(existing.gumroadId);
+  //     body.gumroadId = null;
+  //   } catch (error) {
+  //     console.error("Shopier silme hatası:", error);
+  //   }
+  // }
 
-  // Tekrar aktif ediliyorsa ve Shopier'da yoksa yeniden oluştur
-  if (body.isActive === true && !existing?.gumroadId && existing?.price && existing.price > 0) {
-    try {
-      const shopierProduct = await createShopierProduct({
-        title: body.name || existing.name,
-        description: body.description || existing.description || existing.name,
-        price: body.price ?? existing.price,
-        imageUrl: body.image || existing.image || undefined,
-      });
-      body.gumroadId = shopierProduct.id;
-    } catch (error) {
-      console.error("Shopier yeniden oluşturma hatası:", error);
-    }
-  }
+  // // Tekrar aktif ediliyorsa ve Shopier'da yoksa yeniden oluştur
+  // if (body.isActive === true && !existing?.gumroadId && existing?.price && existing.price > 0) {
+  //   try {
+  //     const shopierProduct = await createShopierProduct({
+  //       title: body.name || existing.name,
+  //       description: body.description || existing.description || existing.name,
+  //       price: body.price ?? existing.price,
+  //       imageUrl: body.image || existing.image || undefined,
+  //     });
+  //     body.gumroadId = shopierProduct.id;
+  //   } catch (error) {
+  //     console.error("Shopier yeniden oluşturma hatası:", error);
+  //   }
+  // }
 
-  // Shopier'da güncelle (shopier ID varsa, deaktive değilse)
-  if (body.isActive !== false && existing?.gumroadId && (body.name || body.description || body.price !== undefined)) {
-    try {
-      await updateShopierProduct(existing.gumroadId, {
-        title: body.name,
-        description: body.description,
-        price: body.price,
-      });
-    } catch (error) {
-      console.error("Shopier güncelleme hatası:", error);
-    }
-  }
+  // // Shopier'da güncelle (shopier ID varsa, deaktive değilse)
+  // if (body.isActive !== false && existing?.gumroadId && (body.name || body.description || body.price !== undefined)) {
+  //   try {
+  //     await updateShopierProduct(existing.gumroadId, {
+  //       title: body.name,
+  //       description: body.description,
+  //       price: body.price,
+  //     });
+  //   } catch (error) {
+  //     console.error("Shopier güncelleme hatası:", error);
+  //   }
+  // }
 
   const product = await prisma.product.update({
     where: { id },
@@ -86,14 +86,14 @@ export async function DELETE(
     return NextResponse.json({ error: "Ürün bulunamadı" }, { status: 404 });
   }
 
-  // Shopier'dan sil
-  if (product.gumroadId) {
-    try {
-      await deleteShopierProduct(product.gumroadId);
-    } catch (error) {
-      console.error("Shopier silme hatası:", error);
-    }
-  }
+  // TODO: Shopier API düzelince tekrar aktif et
+  // if (product.gumroadId) {
+  //   try {
+  //     await deleteShopierProduct(product.gumroadId);
+  //   } catch (error) {
+  //     console.error("Shopier silme hatası:", error);
+  //   }
+  // }
 
   if (permanent) {
     // Siparişi olan ürün kalıcı silinemez
