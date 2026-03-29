@@ -42,12 +42,11 @@ export const metadata: Metadata = {
     description:
       "Aysu Itır Karaçam ile dönüştürücü yoga dersleri. Canlı ve kayıtlı dersler için premium planlara abone olun.",
     type: "website",
-    images: ["https://lovable.dev/opengraph-image-p98pqg.png"],
+    images: ["https://aysuimages.pusulamkendim.com/images/instructor.jpg"],
   },
   twitter: {
     card: "summary_large_image",
-    site: "@lovable_dev",
-    images: ["https://lovable.dev/opengraph-image-p98pqg.png"],
+    images: ["https://aysuimages.pusulamkendim.com/images/instructor.jpg"],
   },
 };
 
