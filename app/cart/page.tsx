@@ -6,10 +6,10 @@ import AuthGuard from "@/components/AuthGuard";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/hooks/use-cart";
 import { formatPrice } from "@/lib/utils";
-import { Trash2, Minus, Plus, ShoppingCart, CreditCard, ExternalLink, Info } from "lucide-react";
+import { Trash2, Minus, Plus, ShoppingCart, CreditCard, Info } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
@@ -199,8 +199,8 @@ function CartContent() {
                           {item.shopierUrl ? (
                             <a href={item.shopierUrl} target="_blank" rel="noopener noreferrer">
                               <Button className="w-full gap-2" size="sm">
-                                <ExternalLink size={14} />
-                                Shopier ile Öde
+                                <CreditCard size={14} />
+                                Ödemeye Geç
                               </Button>
                             </a>
                           ) : (

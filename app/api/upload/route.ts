@@ -1,7 +1,6 @@
 import { auth } from "@/lib/auth";
+import { uploadToR2 } from "@/lib/r2";
 import { NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
 
 export async function POST(request: Request) {
   const session = await auth();
@@ -40,13 +39,14 @@ export async function POST(request: Request) {
   const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
   const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
 
-  const uploadDir = path.join(process.cwd(), "public", "uploads");
-  await mkdir(uploadDir, { recursive: true });
-
-  const filePath = path.join(uploadDir, filename);
-  await writeFile(filePath, buffer);
-
-  const url = `/uploads/${filename}`;
-
-  return NextResponse.json({ url });
+  try {
+    const url = await uploadToR2(buffer, filename, file.type);
+    return NextResponse.json({ url });
+  } catch (error) {
+    console.error("R2 upload hatası:", error);
+    return NextResponse.json(
+      { error: "Görsel yüklenirken hata oluştu" },
+      { status: 500 }
+    );
+  }
 }

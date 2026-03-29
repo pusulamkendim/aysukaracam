@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { updateShopierProduct, deleteShopierProduct } from "@/lib/shopier";
+import { createShopierProduct, updateShopierProduct, deleteShopierProduct } from "@/lib/shopier";
 import { NextResponse } from "next/server";
 
 export async function PATCH(
@@ -25,6 +25,21 @@ export async function PATCH(
       body.gumroadId = null;
     } catch (error) {
       console.error("Shopier silme hatası:", error);
+    }
+  }
+
+  // Tekrar aktif ediliyorsa ve Shopier'da yoksa yeniden oluştur
+  if (body.isActive === true && !existing?.gumroadId && existing?.price && existing.price > 0) {
+    try {
+      const shopierProduct = await createShopierProduct({
+        title: body.name || existing.name,
+        description: body.description || existing.description || existing.name,
+        price: body.price ?? existing.price,
+        imageUrl: body.image || existing.image || undefined,
+      });
+      body.gumroadId = shopierProduct.id;
+    } catch (error) {
+      console.error("Shopier yeniden oluşturma hatası:", error);
     }
   }
 

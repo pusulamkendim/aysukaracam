@@ -1,9 +1,10 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import crypto from "crypto";
+import { sendPaymentConfirmation, sendPaymentNotificationToAdmin } from "@/lib/mail";
 
 /**
- * Shopier ödeme sonrası callback endpoint'i
+ * Shopier ödeme sonrası callback
  * Kullanıcı ödemeyi tamamladıktan sonra Shopier buraya POST eder
  * ve kullanıcıyı siteye geri yönlendirir.
  */
@@ -15,18 +16,19 @@ export async function POST(request: Request) {
       data[key] = value.toString();
     });
 
-    console.log("Shopier callback:", data);
+    console.log("Shopier callback:", JSON.stringify(data));
 
-    const apiSecret = process.env.SHOPIER_CLIENT_SECRET || "";
+    const apiSecret = process.env.SHOPIER_API_SECRET || "";
     const orderId = data.platform_order_id || "";
-    const paymentStatus = data.payment_status || data.status || "";
-    const installment = data.installment || "";
-    const paymentId = data.payment_id || data.random_nr || "";
+    const paymentStatus = data.payment_status || "";
+    const randomNr = data.random_nr || "";
+    const totalValue = data.total_order_value || "";
+    const currency = data.currency || "";
 
     // İmza doğrulama
     const receivedSignature = data.signature || "";
     if (apiSecret && receivedSignature) {
-      const hashData = `${data.random_nr || ""}${orderId}${data.total_order_value || ""}${data.currency || ""}`;
+      const hashData = `${randomNr}${orderId}${totalValue}${currency}`;
       const expectedSignature = crypto
         .createHmac("sha256", apiSecret)
         .update(hashData)
@@ -34,18 +36,19 @@ export async function POST(request: Request) {
 
       if (receivedSignature !== expectedSignature) {
         console.log("Shopier callback: imza doğrulanamadı");
-        return NextResponse.redirect(new URL("/cart?error=signature", process.env.AUTH_URL || "https://aysu.pusulamkendim.com"));
+        const baseUrl = process.env.AUTH_URL || "https://aysu.pusulamkendim.com";
+        return NextResponse.redirect(new URL("/cart?payment=failed", baseUrl));
       }
     }
 
-    // Ödeme başarılı mı?
-    const isSuccess = paymentStatus === "1" || paymentStatus === "success" || paymentStatus === "paid";
+    const isSuccess = paymentStatus === "1";
+    const baseUrl = process.env.AUTH_URL || "https://aysu.pusulamkendim.com";
 
     if (isSuccess && orderId) {
-      // Siparişi onayla
       const order = await prisma.order.findUnique({
         where: { id: orderId },
         include: {
+          user: true,
           items: {
             include: {
               product: { include: { classes: { where: { isActive: true } } } },
@@ -59,7 +62,7 @@ export async function POST(request: Request) {
           where: { id: order.id },
           data: {
             status: "PAID",
-            gumroadSaleId: paymentId || `shopier_callback_${Date.now()}`,
+            gumroadSaleId: `callback_${Date.now()}`,
           },
         });
 
@@ -79,20 +82,22 @@ export async function POST(request: Request) {
         // Sepeti temizle
         await prisma.cartItem.deleteMany({ where: { userId: order.userId } });
 
+        // Mail bildirimleri
+        const itemNames = order.items.map((i) => i.product.name);
+        const totalFormatted = `${(order.totalAmount / 100).toLocaleString("tr-TR")} ₺`;
+        await sendPaymentConfirmation(order.user.email, order.user.name || "", itemNames, totalFormatted);
+        await sendPaymentNotificationToAdmin(order.user.name || "", order.user.email, itemNames, totalFormatted);
+
         console.log(`Sipariş onaylandı (callback): ${order.id}`);
       }
 
-      // Başarılı ödeme → dashboard'a yönlendir
-      const baseUrl = process.env.AUTH_URL || "https://aysu.pusulamkendim.com";
       return NextResponse.redirect(new URL("/dashboard?payment=success", baseUrl));
     }
 
-    // Başarısız ödeme → sepete yönlendir
-    const baseUrl = process.env.AUTH_URL || "https://aysu.pusulamkendim.com";
     return NextResponse.redirect(new URL("/cart?payment=failed", baseUrl));
   } catch (error) {
     console.error("Shopier callback hatası:", error);
     const baseUrl = process.env.AUTH_URL || "https://aysu.pusulamkendim.com";
-    return NextResponse.redirect(new URL("/cart?error=callback", baseUrl));
+    return NextResponse.redirect(new URL("/cart?payment=failed", baseUrl));
   }
 }
